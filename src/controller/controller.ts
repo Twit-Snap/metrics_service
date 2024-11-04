@@ -61,9 +61,18 @@ export class MetricController {
         if (Object.keys(metricsData.metrics).length === 0) {
             throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
         }
+        if(!metricsData.type){
+            throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
+        }
+
         if(metricsData.type === 'register' ) {
             this.validateRegisterMetrics(metricsData.metrics);
         }
+        else if(metricsData.type === 'federated_identity' ) {
+            this.validateFederatedIdentityMetrics(metricsData.metrics);
+        }
+
+
 
     }
 
@@ -77,7 +86,6 @@ export class MetricController {
             throw new ValidationError('metrics', '"count" is required', 'MISSING_FIELD');
         }
 
-        // Validar que 'registration_time' sea un número y exista
         if ('registration_time' in metrics) {
             if (typeof metrics.registration_time !== 'number') {
                 throw new ValidationError('metrics', '"registration_time" must be a number', 'INVALID_REGISTRATION_TIME');
@@ -86,7 +94,6 @@ export class MetricController {
             throw new ValidationError('metrics', '"registration_time" is required', 'MISSING_FIELD');
         }
 
-        // Validar que 'success' sea un booleano y exista
         if ('success' in metrics) {
             if (typeof metrics.success !== 'boolean') {
                 throw new ValidationError('metrics', '"success" must be a boolean', 'INVALID_SUCCESS');
@@ -95,5 +102,25 @@ export class MetricController {
             throw new ValidationError('metrics', '"success" is required', 'MISSING_FIELD');
         }
 
+    }
+
+
+    private validateFederatedIdentityMetrics(metrics: Record<string, never>) {
+
+            if ('count' in metrics) {
+                if (typeof metrics.count !== 'number') {
+                    throw new ValidationError('metrics', '"count" must be a number', 'INVALID_COUNT');
+                }
+            } else {
+                throw new ValidationError('metrics', '"count" is required', 'MISSING_FIELD');
+            }
+
+            if ('provider' in metrics) {
+                if (typeof metrics.provider !== 'string') {
+                    throw new ValidationError('metrics', '"provider" must be a string', 'INVALID_SUCCESS');
+                }
+            } else {
+                throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
+            }
     }
 }
