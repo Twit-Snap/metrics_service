@@ -13,3 +13,11 @@ export interface Metric {
     username: string;
     metrics: Record<string, never>;
 }
+
+
+export interface RegisterMetric {
+    date: string;
+    registerUsers: number;
+    averageRegistrationTime: number;
+    successRate: number;
+}

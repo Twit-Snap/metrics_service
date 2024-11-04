@@ -24,6 +24,16 @@ export class MetricController {
         }
     }
 
+    async getRegisterMetrics(req: Request, res: Response, next: NextFunction) {
+        try {
+            const metrics = await this.metricService.getRegisterMetrics();
+            res.status(200).json({data: metrics});
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+
     private validateParameters(metricsData: MetricDataDto) {
 
         this.validateDate(metricsData.createdAt);
@@ -42,7 +52,6 @@ export class MetricController {
     }
 
     private validateDate(date: string | Date) {
-        console.log(date);
         if (isNaN(new Date(date).getTime()) || !date) {
             throw new ValidationError('createdAt', 'Invalid createdAt', 'INVALID_CREATED_AT');
         }
@@ -60,9 +69,6 @@ export class MetricController {
 
     private validateRegisterMetrics(metrics: Record<string, never>){
 
-
-        // Validar que contenga los campos necesarios
-        // Validar que 'count' sea un número y exista
         if ('count' in metrics) {
             if (typeof metrics.count !== 'number') {
                 throw new ValidationError('metrics', '"count" must be a number', 'INVALID_COUNT');

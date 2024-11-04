@@ -1,5 +1,5 @@
 import {MetricsRepository}  from "../repository/repository";
-import {MetricDataDto, Metric} from "../types/metric";
+import {MetricDataDto, Metric, RegisterMetric} from "../types/metric";
 
 
 export class MetricService {
@@ -11,5 +11,9 @@ export class MetricService {
 
     async createMetrics(metricsData: MetricDataDto): Promise<Metric> {
         return this.metricsRepository.createMetric(metricsData);
+    }
+
+    async getRegisterMetrics(): Promise<RegisterMetric[]> {
+        return this.metricsRepository.getRegisterMetrics();
     }
 }
