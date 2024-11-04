@@ -1,15 +1,15 @@
 
 export type MetricDataDto = {
-    timestamp: Date;
+    createdAt: Date;
     type: string;
-    user: string;
+    username: string;
     metrics: Record<string, never>;
 }
 
 export interface Metric {
     id: number;
-    timestamp: Date;
+    createdAt: Date;
     type: string;
-    user: string;
+    username: string;
     metrics: Record<string, never>;
 }

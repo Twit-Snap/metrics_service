@@ -9,14 +9,14 @@ export class MetricsRepository{
         this.pool = pool || DatabasePool.getInstance();
     }
     async createMetric(metricsData: MetricDataDto): Promise<Metric> {
-        const { timestamp, type, user, metrics } = metricsData;
+        const { createdAt, type, username, metrics } = metricsData;
         const query = `
-            INSERT INTO metrics (timestamp, type, user, metrics)
+            INSERT INTO metrics (created_at, metric_type, username, metrics)
             VALUES ($1, $2, $3, $4)
-            RETURNING id, timestamp, type, user, metrics
-        `;
+            RETURNING id, created_at, metric_type, username, metrics
+    `;
 
-        const result: QueryResult<Metric> = await this.pool.query(query, [timestamp, type, user, metrics]);
+        const result: QueryResult<Metric> = await this.pool.query(query, [createdAt, type, username, metrics]);
         return result.rows[0];
     }
 }

@@ -30,7 +30,7 @@ function initializeEnvironment() {
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 // Function to test the database connection
 async function testDatabaseConnection(retries = 5, delay = 5000) {
@@ -69,7 +69,7 @@ async function startServer() {
     app.use('/metrics', metricRoutes);
 
     // Error handling middleware
-   // app.use(errorHandler);
+    app.use(errorHandler);
 
     app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
