@@ -1,6 +1,13 @@
 import { Pool, QueryResult } from 'pg';
 import {DatabasePool} from "./db";
-import {MetricDataDto, Metric, RegisterMetric, RegisterFederatedIdentityMetric, LoginMetric} from "../types/metric";
+import {
+    MetricDataDto,
+    Metric,
+    RegisterMetric,
+    RegisterFederatedIdentityMetric,
+    LoginMetric,
+    LoginWithProviderMetric
+} from "../types/metric";
 
 export class MetricsRepository{
     private pool: Pool;
@@ -24,7 +31,7 @@ export class MetricsRepository{
         const query = `
             SELECT 
                 DATE(created_at) AS "date", 
-                    COUNT(*)::int AS "registerUsers", 
+                COUNT(*)::int AS "registerUsers", 
                 AVG((metrics->>'registration_time')::float)::float AS "averageRegistrationTime",
                 AVG(CASE WHEN (metrics->>'success')::boolean THEN 1 ELSE 0 END)::float AS "successRate"
             FROM 
@@ -43,29 +50,29 @@ export class MetricsRepository{
 
     }
 
-    async getFederatedIdentityMetrics(): Promise<RegisterFederatedIdentityMetric[]> {
-        const query = `
-        SELECT 
-            DATE "date",
-            COUNT(*)::int AS "totalUsers",
-            json_object_agg(provider, provider_count) AS "providerDistribution"
-        FROM (
+        async getRegisterWithProviderMetrics(): Promise<RegisterFederatedIdentityMetric[]> {
+            const query = `
             SELECT 
-                DATE(created_at) AS "date",
-                metrics->>'provider' AS "provider",
-                COUNT(*)::int AS "provider_count"
-            FROM 
-                metrics
-            WHERE 
-                metric_type = 'register_with_provider'
+                "date",
+                SUM(provider_count)::int AS "totalUsers",
+                json_object_agg(provider, provider_count) AS "providerDistribution"
+            FROM (
+                SELECT 
+                    DATE(created_at) AS "date",
+                    metrics->>'provider' AS "provider",
+                    COUNT(*)::int AS "provider_count"
+                FROM 
+                    metrics
+                WHERE 
+                    metric_type = 'register_with_provider'
+                GROUP BY 
+                    DATE(created_at), metrics->>'provider'
+            ) AS provider_counts
             GROUP BY 
-                DATE(created_at), metrics->>'provider'
-        ) AS provider_counts
-        GROUP BY 
-            date
-        ORDER BY 
-            date;
-    `;
+                date
+            ORDER BY 
+                date;
+        `;
 
         const result: QueryResult<RegisterFederatedIdentityMetric> = await this.pool.query(query);
 
@@ -91,6 +98,27 @@ export class MetricsRepository{
     `;
 
         const result: QueryResult<LoginMetric> = await this.pool.query(query);
+
+        return result.rows;
+    }
+
+    async getLoginWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
+
+        const query = `
+        SELECT 
+             DATE(created_at) AS "date",
+             SUM(CASE WHEN (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLogins"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'login_with_provider'
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+       `;
+
+        const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
 
         return result.rows;
     }
