@@ -79,15 +79,17 @@ export class MetricController {
 
     }
 
-    private validateRegisterMetrics(metrics: Record<string, never>){
-
-        if ('count' in metrics) {
-            if (typeof metrics.count !== 'number') {
-                throw new ValidationError('metrics', '"count" must be a number', 'INVALID_COUNT');
+    private validateSuccessMetric(metrics: Record<string, never>){
+        if ('success' in metrics) {
+            if (typeof metrics.success !== 'boolean') {
+                throw new ValidationError('metrics', '"success" must be a boolean', 'INVALID_SUCCESS');
             }
         } else {
-            throw new ValidationError('metrics', '"count" is required', 'MISSING_FIELD');
+            throw new ValidationError('metrics', '"success" is required', 'MISSING_FIELD');
         }
+    }
+
+    private validateRegisterMetrics(metrics: Record<string, never>){
 
         if ('registration_time' in metrics) {
             if (typeof metrics.registration_time !== 'number') {
@@ -97,70 +99,35 @@ export class MetricController {
             throw new ValidationError('metrics', '"registration_time" is required', 'MISSING_FIELD');
         }
 
-        if ('success' in metrics) {
-            if (typeof metrics.success !== 'boolean') {
-                throw new ValidationError('metrics', '"success" must be a boolean', 'INVALID_SUCCESS');
-            }
-        } else {
-            throw new ValidationError('metrics', '"success" is required', 'MISSING_FIELD');
-        }
+        this.validateSuccessMetric(metrics);
 
     }
 
     private validateLoginMetrics(metrics: Record<string, never>) {
 
-            if ('successfulLogins' in metrics) {
-                if (typeof metrics.successfulLogins !== 'number') {
-                    throw new ValidationError('metrics', '"successfulLogins" must be a number', 'INVALID_SUCCESSFUL_LOGINS');
-                }
-            } else {
-                throw new ValidationError('metrics', '"successfulLogins" is required', 'MISSING_FIELD');
-            }
+        this.validateSuccessMetric(metrics);
 
-            if ('failedLoginAttempts' in metrics) {
-                if (typeof metrics.failedLoginAttempts !== 'number') {
-                    throw new ValidationError('metrics', '"failedLoginAttempts" must be a number', 'INVALID_FAILED_LOGIN_ATTEMPTS');
-                }
-            } else {
-                throw new ValidationError('metrics', '"failedLoginAttempts" is required', 'MISSING_FIELD');
+        if ('averageLoginTime' in metrics) {
+            if (typeof metrics.averageLoginTime !== 'number') {
+                throw new ValidationError('metrics', '"averageLoginTime" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
             }
-
-            if ('averageLoginTime' in metrics) {
-                if (typeof metrics.averageLoginTime !== 'number') {
-                    throw new ValidationError('metrics', '"averageLoginTime" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
-                }
-            } else {
-                throw new ValidationError('metrics', '"averageLoginTime" is required', 'MISSING_FIELD');
-            }
+        } else {
+            throw new ValidationError('metrics', '"averageLoginTime" is required', 'MISSING_FIELD');
+        }
     }
 
     private validateRegisterWithProviderMetrics(metrics: Record<string, never>) {
 
-                if ('count' in metrics) {
-                    if (typeof metrics.count !== 'number') {
-                        throw new ValidationError('metrics', '"count" must be a number', 'INVALID_COUNT');
-                    }
-                } else {
-                    throw new ValidationError('metrics', '"count" is required', 'MISSING_FIELD');
-                }
-
-                if ('provider' in metrics) {
-                    if (typeof metrics.provider !== 'string') {
-                        throw new ValidationError('metrics', '"provider" must be a string', 'INVALID_SUCCESS');
-                    }
-                } else {
-                    throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
-                }
+        if ('provider' in metrics) {
+            if (typeof metrics.provider !== 'string') {
+                throw new ValidationError('metrics', '"provider" must be a string', 'INVALID_SUCCESS');
+            }
+        } else {
+            throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
+        }
     }
 
     private validateLoginWithProviderMetrics(metrics: Record<string, never>) {
-
-        if ('successfulLogins' in metrics) {
-            if (typeof metrics.successfulLogins !== 'number') {
-                throw new ValidationError('metrics', '"successfulLogins" must be a number', 'INVALID_SUCCESSFUL_LOGINS');
-            }
-        } else {
-            throw new ValidationError('metrics', '"successfulLogins" is required', 'MISSING_FIELD');
-        }
+        this.validateSuccessMetric(metrics);
     }
 }
