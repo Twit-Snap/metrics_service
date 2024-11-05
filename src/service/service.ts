@@ -1,5 +1,5 @@
 import {MetricsRepository}  from "../repository/repository";
-import {MetricDataDto, Metric, RegisterMetric} from "../types/metric";
+import {MetricDataDto, Metric, RegisterMetric, RegisterFederatedIdentityMetric, Params} from "../types/metric";
 
 
 export class MetricService {
@@ -13,7 +13,12 @@ export class MetricService {
         return this.metricsRepository.createMetric(metricsData);
     }
 
-    async getRegisterMetrics(): Promise<RegisterMetric[]> {
-        return this.metricsRepository.getRegisterMetrics();
+    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[]> {
+
+        if(params.type == 'register'){
+            return this.metricsRepository.getRegisterMetrics();
+        }else{
+            return this.metricsRepository.getFederatedIdentityMetrics();
+        }
     }
 }

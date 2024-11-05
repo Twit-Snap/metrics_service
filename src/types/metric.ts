@@ -21,3 +21,20 @@ export interface RegisterMetric {
     averageRegistrationTime: number;
     successRate: number;
 }
+
+export interface RegisterFederatedIdentityMetric {
+    date: string;
+    totalUsers: number;
+    providerDistribution: Record<string, number>;
+}
+
+export interface LoginMetric{
+    successfulLogins: number,
+    failedLoginAttempts: number,
+    averageLoginTime: number
+}
+
+export type Params = {
+    type: string,
+}
+

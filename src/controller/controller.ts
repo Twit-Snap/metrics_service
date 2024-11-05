@@ -2,7 +2,7 @@ import {MetricService} from '../service/service';
 import {MetricDataDto} from "../types/metric";
 import {NextFunction, Request, Response} from 'express';
 import {ValidationError} from "../types/customErrors";
-
+import {Params} from "../types/metric";
 
 
 export class MetricController {
@@ -26,7 +26,10 @@ export class MetricController {
 
     async getRegisterMetrics(req: Request, res: Response, next: NextFunction) {
         try {
-            const metrics = await this.metricService.getRegisterMetrics();
+            const params: Params = {
+                type: req.query.type ? req.query.type.toString() : '',
+            };
+            const metrics = await this.metricService.getMetrics(params);
             res.status(200).json({data: metrics});
         }
         catch (error) {
@@ -61,18 +64,15 @@ export class MetricController {
         if (Object.keys(metricsData.metrics).length === 0) {
             throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
         }
-        if(!metricsData.type){
-            throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
-        }
 
         if(metricsData.type === 'register' ) {
             this.validateRegisterMetrics(metricsData.metrics);
         }
-        else if(metricsData.type === 'federated_identity' ) {
+        else if(metricsData.type === 'register_with_provider' ) {
             this.validateFederatedIdentityMetrics(metricsData.metrics);
+        }else{
+            throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
-
-
 
     }
 
@@ -103,7 +103,6 @@ export class MetricController {
         }
 
     }
-
 
     private validateFederatedIdentityMetrics(metrics: Record<string, never>) {
 
