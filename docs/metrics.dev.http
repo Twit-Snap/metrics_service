@@ -5,8 +5,31 @@ POST {{url}}/metrics
 Content-Type: application/json
 
 {
-    "createdAt": "2021-10-01",
+    "createdAt": "2021-10-01T10:00:00.000Z",
     "type": "register",
     "username": "usernameTest",
-    "metrics": {}
+    "metrics": {
+      "count": 1,
+      "registration_time": 10,
+      "success": true
+    }
 }
+
+### POST Create a new metric with provider
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2021-10-02",
+  "type": "register_with_provider",
+  "username": "usernameTest",
+  "metrics": {
+    "count": 1,
+    "provider": "google"
+  }
+}
+
+### GET register metrics
+GET {{url}}/metrics/register?type=register_with_provider
+Content-Type: application/json
+
