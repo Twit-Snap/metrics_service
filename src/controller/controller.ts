@@ -67,9 +67,10 @@ export class MetricController {
 
         if(metricsData.type === 'register' ) {
             this.validateRegisterMetrics(metricsData.metrics);
-        }
-        else if(metricsData.type === 'register_with_provider' ) {
+        }else if(metricsData.type === 'register_with_provider' ) {
             this.validateFederatedIdentityMetrics(metricsData.metrics);
+        }else if (metricsData.type === 'login'){
+            this.validateLoginMetrics(metricsData.metrics);
         }else{
             throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
@@ -120,6 +121,33 @@ export class MetricController {
                 }
             } else {
                 throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
+            }
+    }
+
+    private validateLoginMetrics(metrics: Record<string, never>) {
+
+            if ('successfulLogins' in metrics) {
+                if (typeof metrics.successfulLogins !== 'number') {
+                    throw new ValidationError('metrics', '"successfulLogins" must be a number', 'INVALID_SUCCESSFUL_LOGINS');
+                }
+            } else {
+                throw new ValidationError('metrics', '"successfulLogins" is required', 'MISSING_FIELD');
+            }
+
+            if ('failedLoginAttempts' in metrics) {
+                if (typeof metrics.failedLoginAttempts !== 'number') {
+                    throw new ValidationError('metrics', '"failedLoginAttempts" must be a number', 'INVALID_FAILED_LOGIN_ATTEMPTS');
+                }
+            } else {
+                throw new ValidationError('metrics', '"failedLoginAttempts" is required', 'MISSING_FIELD');
+            }
+
+            if ('averageLoginTime' in metrics) {
+                if (typeof metrics.averageLoginTime !== 'number') {
+                    throw new ValidationError('metrics', '"averageLoginTime" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
+                }
+            } else {
+                throw new ValidationError('metrics', '"averageLoginTime" is required', 'MISSING_FIELD');
             }
     }
 }
