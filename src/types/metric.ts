@@ -16,7 +16,7 @@ export interface Metric {
 
 
 export interface RegisterMetric {
-    date: string;
+    date: Date;
     registerUsers: number;
     averageRegistrationTime: number;
     successRate: number;
@@ -29,9 +29,15 @@ export interface RegisterFederatedIdentityMetric {
 }
 
 export interface LoginMetric{
+    date: Date,
     successfulLogins: number,
-    failedLoginAttempts: number,
+    failedLoginAttempt: number,
     averageLoginTime: number
+}
+
+export interface LoginWithProviderMetric{
+    date: Date,
+    successfulLogins: number,
 }
 
 export type Params = {

@@ -5,7 +5,7 @@ import {
     RegisterMetric,
     RegisterFederatedIdentityMetric,
     Params,
-    LoginMetric
+    LoginMetric, LoginWithProviderMetric
 } from "../types/metric";
 
 
@@ -20,14 +20,16 @@ export class MetricService {
         return this.metricsRepository.createMetric(metricsData);
     }
 
-    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[]> {
+    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[]> {
 
         if(params.type == 'register'){
             return this.metricsRepository.getRegisterMetrics();
         }else if (params.type == 'register_with_provider'){
-            return this.metricsRepository.getFederatedIdentityMetrics();
-        }else{
-            return this.metricsRepository.getLoginMetrics()
+            return this.metricsRepository.getRegisterWithProviderMetrics();
+        }else if(params.type == 'login'){
+            return this.metricsRepository.getLoginMetrics();
+        }else{ //login_with_provider
+            return this.metricsRepository.getLoginWithProviderMetrics();
         }
     }
 }
