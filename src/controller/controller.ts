@@ -107,12 +107,12 @@ export class MetricController {
 
         this.validateSuccessMetric(metrics);
 
-        if ('averageLoginTime' in metrics) {
-            if (typeof metrics.averageLoginTime !== 'number') {
-                throw new ValidationError('metrics', '"averageLoginTime" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
+        if ('login_time' in metrics) {
+            if (typeof metrics.login_time !== 'number') {
+                throw new ValidationError('metrics', '"login_time" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
             }
         } else {
-            throw new ValidationError('metrics', '"averageLoginTime" is required', 'MISSING_FIELD');
+            throw new ValidationError('metrics', '"login_time" is required', 'MISSING_FIELD');
         }
     }
 
