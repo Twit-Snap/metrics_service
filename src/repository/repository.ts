@@ -1,6 +1,6 @@
 import { Pool, QueryResult } from 'pg';
 import {DatabasePool} from "./db";
-import {MetricDataDto, Metric, RegisterMetric, RegisterFederatedIdentityMetric} from "../types/metric";
+import {MetricDataDto, Metric, RegisterMetric, RegisterFederatedIdentityMetric, LoginMetric} from "../types/metric";
 
 export class MetricsRepository{
     private pool: Pool;
@@ -72,4 +72,26 @@ export class MetricsRepository{
         return result.rows;
     }
 
+    async getLoginMetrics(): Promise<LoginMetric[]> {
+
+        const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+            SUM(CASE WHEN (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLogins",
+            SUM(CASE WHEN (metrics->>'success')::boolean THEN 0 ELSE 1 END)::int AS "failedLoginAttempts",
+            AVG((metrics->>'login_time')::float)::float AS "averageLoginTime"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'login'
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+    `;
+
+        const result: QueryResult<LoginMetric> = await this.pool.query(query);
+
+        return result.rows;
+    }
 }
