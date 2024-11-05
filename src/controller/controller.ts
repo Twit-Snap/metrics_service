@@ -68,12 +68,11 @@ export class MetricController {
         if(metricsData.type === 'register' ) {
             this.validateRegisterMetrics(metricsData.metrics);
         }else if(metricsData.type === 'register_with_provider' ) {
-            this.validateWithProviderMetrics(metricsData.metrics);
+            this.validateRegisterWithProviderMetrics(metricsData.metrics);
         }else if (metricsData.type === 'login'){
             this.validateLoginMetrics(metricsData.metrics);
         }else if (metricsData.type === 'login_with_provider'){
-            this.validateWithProviderMetrics(metricsData.metrics);
-
+            this.validateLoginWithProviderMetrics(metricsData.metrics);
         }else {
             throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
@@ -135,7 +134,7 @@ export class MetricController {
             }
     }
 
-    private validateWithProviderMetrics(metrics: Record<string, never>) {
+    private validateRegisterWithProviderMetrics(metrics: Record<string, never>) {
 
                 if ('count' in metrics) {
                     if (typeof metrics.count !== 'number') {
@@ -152,5 +151,16 @@ export class MetricController {
                 } else {
                     throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
                 }
+    }
+
+    private validateLoginWithProviderMetrics(metrics: Record<string, never>) {
+
+        if ('successfulLogins' in metrics) {
+            if (typeof metrics.successfulLogins !== 'number') {
+                throw new ValidationError('metrics', '"successfulLogins" must be a number', 'INVALID_SUCCESSFUL_LOGINS');
+            }
+        } else {
+            throw new ValidationError('metrics', '"successfulLogins" is required', 'MISSING_FIELD');
+        }
     }
 }
