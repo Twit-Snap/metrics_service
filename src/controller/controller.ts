@@ -122,7 +122,7 @@ export class MetricController {
 
     private validateBlockedMetrics(metrics: Record<string, never>) {
         if ('blocked' in metrics) {
-            if (typeof metrics !== 'boolean') {
+            if (typeof metrics.blocked !== 'boolean') {
                 throw new ValidationError('metrics', '"blocked" must be a boolean', 'INVALID_BLOCKED');
             }
         } else {
