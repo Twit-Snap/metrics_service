@@ -71,7 +71,11 @@ export class MetricController {
             this.validateRegisterWithProviderMetrics(metricsData.metrics);
         }else if (metricsData.type === 'login_with_provider'){
             this.validateLoginWithProviderMetrics(metricsData.metrics);
-        }else {
+        }else if(metricsData.type === 'blocked'){
+            this.validateBlockedMetrics(metricsData.metrics);
+
+        }else
+         {
             throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
 
@@ -93,8 +97,8 @@ export class MetricController {
         this.validateSuccessMetric(metrics);
 
         if ('event_time' in metrics) {
-            if (typeof metrics.login_time !== 'number') {
-                throw new ValidationError('metrics', '"event_time" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
+            if (typeof metrics.event_time !== 'number') {
+                throw new ValidationError('metrics', '"event_time" must be a number', 'INVALID_AVERAGE_TIME');
             }
         } else {
             throw new ValidationError('metrics', '"event_time" is required', 'MISSING_FIELD');
@@ -114,5 +118,15 @@ export class MetricController {
 
     private validateLoginWithProviderMetrics(metrics: Record<string, never>) {
         this.validateSuccessMetric(metrics);
+    }
+
+    private validateBlockedMetrics(metrics: Record<string, never>) {
+        if ('blocked' in metrics) {
+            if (typeof metrics !== 'boolean') {
+                throw new ValidationError('metrics', '"blocked" must be a boolean', 'INVALID_BLOCKED');
+            }
+        } else {
+            throw new ValidationError('metrics', '"blocked" is required', 'MISSING_FIELD');
+        }
     }
 }

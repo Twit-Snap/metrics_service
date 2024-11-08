@@ -5,7 +5,8 @@ import {
     RegisterMetric,
     RegisterFederatedIdentityMetric,
     Params,
-    LoginMetric, LoginWithProviderMetric
+    LoginMetric, LoginWithProviderMetric,
+    BlockedMetric
 } from "../types/metric";
 
 
@@ -20,8 +21,8 @@ export class MetricService {
         return this.metricsRepository.createMetric(metricsData);
     }
 
-    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[]> {
-        let metrics: RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[];
+    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] > {
+        let metrics: RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] = [];
 
         if(params.type == 'register'){
             metrics = await this.metricsRepository.getRegisterMetrics();
@@ -29,9 +30,12 @@ export class MetricService {
              metrics = await this.metricsRepository.getRegisterWithProviderMetrics();
         }else if(params.type == 'login'){
              metrics = await this.metricsRepository.getLoginMetrics();
-        }else{ //login_with_provider
+        }else if(params.type == 'login_with_provider'){
              metrics = await this.metricsRepository.getLoginWithProviderMetrics();
+        }else if(params.type == 'blocked') {
+            metrics = await this.metricsRepository.getBlockedMetrics();
         }
+
         return metrics
     }
 }

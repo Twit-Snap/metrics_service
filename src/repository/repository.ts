@@ -6,8 +6,8 @@ import {
     RegisterMetric,
     RegisterFederatedIdentityMetric,
     LoginMetric,
-    LoginWithProviderMetric
-} from "../types/metric";
+    LoginWithProviderMetric, BlockedMetric
+} from '../types/metric';
 
 export class MetricsRepository{
     private pool: Pool;
@@ -119,6 +119,26 @@ export class MetricsRepository{
        `;
 
         const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
+
+        return result.rows;
+    }
+
+    async getBlockedMetrics(): Promise<BlockedMetric[]>{
+        const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+            COUNT(*)::int AS "blockedUsers"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'blocked'
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+    `;
+
+        const result: QueryResult<BlockedMetric> = await this.pool.query(query);
 
         return result.rows;
     }

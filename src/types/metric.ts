@@ -40,6 +40,10 @@ export interface LoginWithProviderMetric{
     successfulLogins: number,
 }
 
+export interface BlockedMetric{
+    date: Date,
+    blockedUsers: number
+}
 export type Params = {
     type: string,
 }
