@@ -17,8 +17,8 @@ export class MetricController {
             const metricsData: MetricDataDto = req.body;
             this.validateParameters(metricsData);
             const metric = await this.metricService.createMetrics(metricsData);
+            console.log('Successfully created metric', metric);
             res.status(201).json({data: metric});
-
         } catch (error) {
             next(error);
         }
@@ -65,12 +65,10 @@ export class MetricController {
             throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
         }
 
-        if(metricsData.type === 'register' ) {
-            this.validateRegisterMetrics(metricsData.metrics);
+        if(metricsData.type === 'register' || metricsData.type === 'login') {
+            this.validateNormalMetrics(metricsData.metrics);
         }else if(metricsData.type === 'register_with_provider' ) {
             this.validateRegisterWithProviderMetrics(metricsData.metrics);
-        }else if (metricsData.type === 'login'){
-            this.validateLoginMetrics(metricsData.metrics);
         }else if (metricsData.type === 'login_with_provider'){
             this.validateLoginWithProviderMetrics(metricsData.metrics);
         }else {
@@ -89,30 +87,17 @@ export class MetricController {
         }
     }
 
-    private validateRegisterMetrics(metrics: Record<string, never>){
 
-        if ('registration_time' in metrics) {
-            if (typeof metrics.registration_time !== 'number') {
-                throw new ValidationError('metrics', '"registration_time" must be a number', 'INVALID_REGISTRATION_TIME');
-            }
-        } else {
-            throw new ValidationError('metrics', '"registration_time" is required', 'MISSING_FIELD');
-        }
+    private validateNormalMetrics(metrics: Record<string, never>) {
 
         this.validateSuccessMetric(metrics);
 
-    }
-
-    private validateLoginMetrics(metrics: Record<string, never>) {
-
-        this.validateSuccessMetric(metrics);
-
-        if ('login_time' in metrics) {
+        if ('event_time' in metrics) {
             if (typeof metrics.login_time !== 'number') {
-                throw new ValidationError('metrics', '"login_time" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
+                throw new ValidationError('metrics', '"event_time" must be a number', 'INVALID_AVERAGE_LOGIN_TIME');
             }
         } else {
-            throw new ValidationError('metrics', '"login_time" is required', 'MISSING_FIELD');
+            throw new ValidationError('metrics', '"event_time" is required', 'MISSING_FIELD');
         }
     }
 
