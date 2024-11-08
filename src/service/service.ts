@@ -21,15 +21,17 @@ export class MetricService {
     }
 
     async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[]> {
+        let metrics: RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[];
 
         if(params.type == 'register'){
-            return this.metricsRepository.getRegisterMetrics();
+            metrics = await this.metricsRepository.getRegisterMetrics();
         }else if (params.type == 'register_with_provider'){
-            return this.metricsRepository.getRegisterWithProviderMetrics();
+             metrics = await this.metricsRepository.getRegisterWithProviderMetrics();
         }else if(params.type == 'login'){
-            return this.metricsRepository.getLoginMetrics();
+             metrics = await this.metricsRepository.getLoginMetrics();
         }else{ //login_with_provider
-            return this.metricsRepository.getLoginWithProviderMetrics();
+             metrics = await this.metricsRepository.getLoginWithProviderMetrics();
         }
+        return metrics
     }
 }

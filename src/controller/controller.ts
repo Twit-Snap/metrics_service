@@ -15,7 +15,7 @@ export class MetricController {
     async createMetrics(req: Request, res: Response, next: NextFunction) {
         try{
             const metricsData: MetricDataDto = req.body;
-                this.validateParameters(metricsData);
+            this.validateParameters(metricsData);
             const metric = await this.metricService.createMetrics(metricsData);
             res.status(201).json({data: metric});
 
