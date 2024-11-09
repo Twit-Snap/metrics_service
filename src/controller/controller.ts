@@ -44,9 +44,6 @@ export class MetricController {
         if (!metricsData.metrics) {
             throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
         }
-        if (!metricsData.username) {
-            throw new ValidationError('user', 'Invalid user', 'INVALID_USER');
-        }
         if (!metricsData.type) {
             throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
