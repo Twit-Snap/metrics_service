@@ -24,7 +24,7 @@ export class MetricController {
         }
     }
 
-    async getRegisterMetrics(req: Request, res: Response, next: NextFunction) {
+    async getMetrics(req: Request, res: Response, next: NextFunction) {
         try {
             const params: Params = {
                 type: req.query.type ? req.query.type.toString() : '',

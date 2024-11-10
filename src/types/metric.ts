@@ -30,6 +30,7 @@ export interface RegisterFederatedIdentityMetric {
 
 export interface LoginMetric{
     date: Date,
+    loginUsers: number,
     successfulLogins: number,
     failedLoginAttempt: number,
     averageLoginTime: number
