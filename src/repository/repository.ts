@@ -104,20 +104,20 @@ export class MetricsRepository{
     }
 
     async getLoginWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
-
         const query = `
         SELECT 
-             DATE(created_at) AS "date",
-             SUM(CASE WHEN (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLogins"
+            DATE(created_at) AS "date",
+            SUM(CASE WHEN metric_type = 'login' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulLogins",
+            SUM(CASE WHEN metric_type = 'login_with_provider' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulLoginsWithProvider"
         FROM 
             metrics
         WHERE 
-            metric_type = 'login_with_provider'
+            metric_type IN ('login', 'login_with_provider') 
         GROUP BY 
             DATE(created_at)
         ORDER BY 
             DATE(created_at);
-       `;
+    `;
 
         const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
 

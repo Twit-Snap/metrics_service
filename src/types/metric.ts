@@ -36,9 +36,10 @@ export interface LoginMetric{
     averageLoginTime: number
 }
 
-export interface LoginWithProviderMetric{
+export interface LoginWithProviderMetric {
     date: Date,
-    successfulLogins: number,
+    successfulLogins: number;
+    successfulLoginsWithProvider: number;
 }
 
 export interface BlockedMetric{
