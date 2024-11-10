@@ -28,6 +28,7 @@ export class MetricService {
             metrics = await this.metricsRepository.getRegisterMetrics();
         }else if (params.type == 'register_with_provider'){
              metrics = await this.metricsRepository.getRegisterWithProviderMetrics();
+             console.log(metrics);
         }else if(params.type == 'login'){
              metrics = await this.metricsRepository.getLoginMetrics();
         }else if(params.type == 'login_with_provider'){

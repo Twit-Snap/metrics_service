@@ -50,7 +50,7 @@ export class MetricsRepository{
 
     }
 
-    async getRegisterWithProviderMetrics(): Promise<RegisterFederatedIdentityMetric[]> {
+    async getRegisterWithProviderMetrics_(): Promise<RegisterFederatedIdentityMetric[]> {
         const query = `
         SELECT 
             "date",
@@ -75,6 +75,26 @@ export class MetricsRepository{
     `;
 
         const result: QueryResult<RegisterFederatedIdentityMetric> = await this.pool.query(query);
+
+        return result.rows;
+    }
+    async getRegisterWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
+        const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+            SUM(CASE WHEN metric_type = 'register' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulRegisters",
+            SUM(CASE WHEN metric_type = 'register_with_provider' THEN 1 ELSE 0 END) AS "successfulRegistersWithProvider"
+        FROM 
+            metrics
+        WHERE 
+            metric_type IN ('register', 'register_with_provider') 
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+    `;
+
+        const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
 
         return result.rows;
     }

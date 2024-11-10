@@ -24,8 +24,8 @@ export interface RegisterMetric {
 
 export interface RegisterFederatedIdentityMetric {
     date: string;
-    totalUsers: number;
-    providerDistribution: Record<string, number>;
+    successfulRegisters: number;
+    successfulRegistersWithProvider: number;
 }
 
 export interface LoginMetric{

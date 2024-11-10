@@ -58,9 +58,6 @@ export class MetricController {
     }
 
     private validateMetrics(metricsData: MetricDataDto) {
-        if (Object.keys(metricsData.metrics).length === 0) {
-            throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
-        }
 
         if(metricsData.type === 'register' || metricsData.type === 'login') {
             this.validateNormalMetrics(metricsData.metrics);
@@ -103,13 +100,8 @@ export class MetricController {
     }
 
     private validateRegisterWithProviderMetrics(metrics: Record<string, never>) {
-
-        if ('provider' in metrics) {
-            if (typeof metrics.provider !== 'string') {
-                throw new ValidationError('metrics', '"provider" must be a string', 'INVALID_SUCCESS');
-            }
-        } else {
-            throw new ValidationError('metrics', '"provider" is required', 'MISSING_FIELD');
+        if (Object.keys(metrics).length != 0) {
+            throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
         }
     }
 
