@@ -18,9 +18,9 @@ $do$;
 -- Create the metrics table if it doesn't exist
 CREATE TABLE IF NOT EXISTS metrics (
     id SERIAL PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    type VARCHAR(50) NOT NULL,
-    user VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    metric_type VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL,
     metrics JSONB NOT NULL
 );
 

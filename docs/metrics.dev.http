@@ -1,0 +1,73 @@
+@url = http://localhost:4000
+
+### POST Create register metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+    "createdAt": "2021-10-02",
+    "type": "register",
+    "username": "usernameTest",
+    "metrics": {
+      "registration_time": 10,
+      "success": true
+    }
+}
+
+### POST Create register metric with provider
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2021-10-02",
+  "type": "register_with_provider",
+  "username": "usernameTest",
+  "metrics": {
+    "provider": "facebook"
+  }
+}
+
+### POST Create login metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2021-10-11",
+  "type": "login",
+  "username": "usernameTest",
+  "metrics": {
+    "success": true,
+    "averageLoginTime": 10
+
+  }
+}
+
+### POST Create login with provider
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2021-11-11",
+  "type": "login_with_provider",
+  "username": "usernameTest",
+  "metrics": {
+    "success": true
+  }
+}
+
+### GET register metrics
+GET {{url}}/metrics/register?type=register
+Content-Type: application/json
+
+### GET register with provider metrics
+GET {{url}}/metrics/register?type=register_with_provider
+Content-Type: application/json
+
+### GET login metrics
+GET {{url}}/metrics/register?type=login
+Content-Type: application/json
+
+### GET login with provider metrics
+GET {{url}}/metrics/register?type=login_with_provider
+Content-Type: application/json
+
