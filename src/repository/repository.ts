@@ -4,7 +4,6 @@ import {
     MetricDataDto,
     Metric,
     RegisterMetric,
-    RegisterFederatedIdentityMetric,
     LoginMetric,
     LoginWithProviderMetric, BlockedMetric
 } from '../types/metric';
@@ -50,40 +49,12 @@ export class MetricsRepository{
 
     }
 
-    async getRegisterWithProviderMetrics_(): Promise<RegisterFederatedIdentityMetric[]> {
-        const query = `
-        SELECT 
-            "date",
-            SUM(provider_count)::int AS "totalUsers",
-            json_object_agg(provider, provider_count) AS "providerDistribution"
-        FROM (
-            SELECT 
-                DATE(created_at) AS "date",
-                metrics->>'provider' AS "provider",
-                COUNT(*)::int AS "provider_count"
-            FROM 
-                metrics
-            WHERE 
-                metric_type = 'register_with_provider'
-            GROUP BY 
-                DATE(created_at), metrics->>'provider'
-        ) AS provider_counts
-        GROUP BY 
-            date
-        ORDER BY 
-            date;
-    `;
-
-        const result: QueryResult<RegisterFederatedIdentityMetric> = await this.pool.query(query);
-
-        return result.rows;
-    }
     async getRegisterWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
         const query = `
         SELECT 
             DATE(created_at) AS "date",
-            SUM(CASE WHEN metric_type = 'register' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulRegisters",
-            SUM(CASE WHEN metric_type = 'register_with_provider' THEN 1 ELSE 0 END) AS "successfulRegistersWithProvider"
+            SUM(CASE WHEN metric_type = 'register' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulRegisters",
+            SUM(CASE WHEN metric_type = 'register_with_provider' THEN 1 ELSE 0 END)::int AS "successfulRegistersWithProvider"
         FROM 
             metrics
         WHERE 
@@ -127,8 +98,8 @@ export class MetricsRepository{
         const query = `
         SELECT 
             DATE(created_at) AS "date",
-            SUM(CASE WHEN metric_type = 'login' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulLogins",
-            SUM(CASE WHEN metric_type = 'login_with_provider' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END) AS "successfulLoginsWithProvider"
+            SUM(CASE WHEN metric_type = 'login' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLogins",
+            SUM(CASE WHEN metric_type = 'login_with_provider' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLoginsWithProvider"
         FROM 
             metrics
         WHERE 

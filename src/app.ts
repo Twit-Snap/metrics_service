@@ -21,7 +21,6 @@ function initializeEnvironment() {
     const debugEnvVars = {
         NODE_ENV: env,
         DATABASE_URL: env === 'development' ? process.env.DATABASE_URL : 'url its a secret... shhh',
-        //JWT_SECRET_KEY: env === 'development' ? process.env.JWT_SECRET_KEY : 'jwt its a secret... shhh'
     };
     console.log('envFilePath:', envFilePath);
     console.log('Environment variables: ', debugEnvVars);
@@ -87,3 +86,7 @@ startServer().catch((err) => {
     console.error('Failed to start server:', err);
     process.exit(1);
 });
+
+
+
+export default app;

@@ -85,14 +85,13 @@ export class MetricController {
         }
     }
 
-
     private validateNormalMetrics(metrics: Record<string, never>) {
 
         this.validateSuccessMetric(metrics);
 
         if ('event_time' in metrics) {
             if (typeof metrics.event_time !== 'number') {
-                throw new ValidationError('metrics', '"event_time" must be a number', 'INVALID_AVERAGE_TIME');
+                throw new ValidationError('metrics', '"event_time" must be a number', 'INVALID_EVENT_TIME');
             }
         } else {
             throw new ValidationError('metrics', '"event_time" is required', 'MISSING_FIELD');
