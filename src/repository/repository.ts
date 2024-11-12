@@ -1,33 +1,40 @@
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, QueryResultRow } from 'pg';
 import {DatabasePool} from "./db";
 import {
     MetricDataDto,
     Metric,
     RegisterMetric,
     LoginMetric,
-    LoginWithProviderMetric, BlockedMetric
+    LoginWithProviderMetric,
+    BlockedMetric,
+    TwitMetric
 } from '../types/metric';
 
-export class MetricsRepository{
-    private pool: Pool;
+export class MetricsRepository {
+  private pool: Pool;
 
-    constructor(pool?: Pool) {
-        this.pool = pool || DatabasePool.getInstance();
-    }
-    async createMetric(metricsData: MetricDataDto): Promise<Metric> {
-        const { createdAt, type, username, metrics } = metricsData;
-        const query = `
+  constructor(pool?: Pool) {
+    this.pool = pool || DatabasePool.getInstance();
+  }
+  async createMetric(metricsData: MetricDataDto): Promise<Metric> {
+    const { createdAt, type, username, metrics } = metricsData;
+    const query = `
             INSERT INTO metrics (created_at, metric_type, username, metrics)
             VALUES ($1, $2, $3, $4)
-            RETURNING id, created_at, metric_type, username, metrics
+            RETURNING id, created_at AS "createdAt", metric_type AS "type", username, metrics
     `;
 
-        const result: QueryResult<Metric> = await this.pool.query(query, [createdAt, type, username, metrics]);
-        return result.rows[0];
-    }
+    const result: QueryResult<Metric> = await this.pool.query(query, [
+      createdAt,
+      type,
+      username,
+      metrics
+    ]);
+    return result.rows[0];
+  }
 
-    async getRegisterMetrics(): Promise<RegisterMetric[]> {
-        const query = `
+  async getRegisterMetrics(): Promise<RegisterMetric[]> {
+    const query = `
             SELECT 
                 DATE(created_at) AS "date", 
                 COUNT(*)::int AS "registerUsers", 
@@ -43,14 +50,12 @@ export class MetricsRepository{
                 DATE(created_at);
             `;
 
-        const result: QueryResult<RegisterMetric> = await this.pool.query(query);
-        console.log(result.rows);
-        return result.rows;
+    const result: QueryResult<RegisterMetric> = await this.pool.query(query);
+    return result.rows;
+  }
 
-    }
-
-    async getRegisterWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
-        const query = `
+  async getRegisterWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
+    const query = `
         SELECT 
             DATE(created_at) AS "date",
             SUM(CASE WHEN metric_type = 'register' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulRegisters",
@@ -65,14 +70,13 @@ export class MetricsRepository{
             DATE(created_at);
     `;
 
-        const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
+    const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
 
-        return result.rows;
-    }
+    return result.rows;
+  }
 
-    async getLoginMetrics(): Promise<LoginMetric[]> {
-
-        const query = `
+  async getLoginMetrics(): Promise<LoginMetric[]> {
+    const query = `
         SELECT 
             DATE(created_at) AS "date",
              COUNT(*)::int AS "loginUsers", 
@@ -89,13 +93,13 @@ export class MetricsRepository{
             DATE(created_at);
     `;
 
-        const result: QueryResult<LoginMetric> = await this.pool.query(query);
+    const result: QueryResult<LoginMetric> = await this.pool.query(query);
 
-        return result.rows;
-    }
+    return result.rows;
+  }
 
-    async getLoginWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
-        const query = `
+  async getLoginWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
+    const query = `
         SELECT 
             DATE(created_at) AS "date",
             SUM(CASE WHEN metric_type = 'login' AND (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulLogins",
@@ -110,13 +114,13 @@ export class MetricsRepository{
             DATE(created_at);
     `;
 
-        const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
+    const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
 
-        return result.rows;
-    }
+    return result.rows;
+  }
 
-    async getBlockedMetrics(): Promise<BlockedMetric[]>{
-        const query = `
+  async getBlockedMetrics(): Promise<BlockedMetric[]> {
+    const query = `
         SELECT 
             DATE(created_at) AS "date",
             COUNT(*)::int AS "blockedUsers"
@@ -130,8 +134,47 @@ export class MetricsRepository{
             DATE(created_at);
     `;
 
-        const result: QueryResult<BlockedMetric> = await this.pool.query(query);
+    const result: QueryResult<BlockedMetric> = await this.pool.query(query);
 
-        return result.rows;
-    }
+    return result.rows;
+  }
+
+  private async getMetricsByUsername<T extends QueryResultRow>(
+    username: string | undefined,
+    metricType: string
+  ): Promise<T[]> {
+    const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+            COUNT(*)::int AS "amount"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = $1 AND username = $2
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+    `;
+
+    const result: QueryResult<T> = await this.pool.query(query, [metricType, username]);
+
+    return result.rows;
+  }
+
+  async getTwitMetricsByUsername(username: string | undefined): Promise<TwitMetric[]> {
+    return this.getMetricsByUsername<TwitMetric>(username, 'twit');
+  }
+
+  async getLikeMetricsByUsername(username: string | undefined): Promise<TwitMetric[]> {
+    return this.getMetricsByUsername<TwitMetric>(username, 'like');
+  }
+
+  async getRetwitMetricsByUsername(username: string | undefined): Promise<TwitMetric[]> {
+    return this.getMetricsByUsername<TwitMetric>(username, 'retwit');
+  }
+
+  async getCommentMetricsByUsername(username: string | undefined): Promise<TwitMetric[]> {
+    return this.getMetricsByUsername<TwitMetric>(username, 'comment');
+  }
 }

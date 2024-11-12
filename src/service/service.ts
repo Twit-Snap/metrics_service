@@ -6,8 +6,8 @@ import {
     RegisterFederatedIdentityMetric,
     Params,
     LoginMetric, LoginWithProviderMetric,
-    BlockedMetric
-} from "../types/metric";
+    BlockedMetric, TwitMetric
+} from '../types/metric';
 
 
 export class MetricService {
@@ -21,8 +21,8 @@ export class MetricService {
         return this.metricsRepository.createMetric(metricsData);
     }
 
-    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] > {
-        let metrics: RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] = [];
+    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] > {
+        let metrics: RegisterMetric[] | RegisterFederatedIdentityMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] = [];
 
         if(params.type == 'register'){
             metrics = await this.metricsRepository.getRegisterMetrics();
@@ -35,6 +35,14 @@ export class MetricService {
              metrics = await this.metricsRepository.getLoginWithProviderMetrics();
         }else if(params.type == 'blocked') {
             metrics = await this.metricsRepository.getBlockedMetrics();
+        }else if (params.type == 'twit'){
+            metrics = await this.metricsRepository.getTwitMetricsByUsername(params.username);
+        }else if (params.type == 'like') {
+            metrics = await this.metricsRepository.getLikeMetricsByUsername(params.username);
+        }else if (params.type == 'retwit') {
+            metrics = await this.metricsRepository.getRetwitMetricsByUsername(params.username);
+        }else if(params.type == 'comment') {
+            metrics = await this.metricsRepository.getCommentMetricsByUsername(params.username);
         }
 
         return metrics

@@ -3,7 +3,7 @@ export type MetricDataDto = {
     createdAt: Date;
     type: string;
     username: string;
-    metrics: Record<string, never>;
+    metrics: Record<string, string | number | boolean | Date>;
 }
 
 export interface Metric {
@@ -11,7 +11,7 @@ export interface Metric {
     createdAt: Date;
     type: string;
     username: string;
-    metrics: Record<string, never>;
+    metrics: Record<string, string | number | boolean | Date>;
 }
 
 
@@ -47,7 +47,14 @@ export interface BlockedMetric{
     blockedUsers: number
 }
 
+export interface TwitMetric {
+    date: Date,
+    amount: number
+}
+
+
 export type Params = {
     type: string,
+    username?: string
 }
 

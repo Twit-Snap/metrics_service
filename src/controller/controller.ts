@@ -28,7 +28,9 @@ export class MetricController {
         try {
             const params: Params = {
                 type: req.query.type ? req.query.type.toString() : '',
+                username: req.query.username ? req.query.username.toString() : ''
             };
+            this.validateTwitMetrics(params);
             const metrics = await this.metricService.getMetrics(params);
             res.status(200).json({data: metrics});
         }
@@ -36,6 +38,8 @@ export class MetricController {
             next(error);
         }
     }
+
+
 
     private validateParameters(metricsData: MetricDataDto) {
 
@@ -61,8 +65,8 @@ export class MetricController {
 
         if(metricsData.type === 'register' || metricsData.type === 'login') {
             this.validateNormalMetrics(metricsData.metrics);
-        }else if(metricsData.type === 'register_with_provider' ) {
-            this.validateRegisterWithProviderMetrics(metricsData.metrics);
+        }else if(metricsData.type === 'register_with_provider' || metricsData.type === 'twit' || metricsData.type === 'like' || metricsData.type === 'retwit' || metricsData.type === 'comment'  ) {
+            this.validateEmptyBodyMetric(metricsData.metrics);
         }else if (metricsData.type === 'login_with_provider'){
             this.validateLoginWithProviderMetrics(metricsData.metrics);
         }else if(metricsData.type === 'blocked'){
@@ -75,7 +79,7 @@ export class MetricController {
 
     }
 
-    private validateSuccessMetric(metrics: Record<string, never>){
+    private validateSuccessMetric(metrics: Record<string, string | number | boolean | Date>){
         if ('success' in metrics) {
             if (typeof metrics.success !== 'boolean') {
                 throw new ValidationError('metrics', '"success" must be a boolean', 'INVALID_SUCCESS');
@@ -85,7 +89,7 @@ export class MetricController {
         }
     }
 
-    private validateNormalMetrics(metrics: Record<string, never>) {
+    private validateNormalMetrics(metrics: Record<string, string | number | boolean | Date>) {
 
         this.validateSuccessMetric(metrics);
 
@@ -98,23 +102,31 @@ export class MetricController {
         }
     }
 
-    private validateRegisterWithProviderMetrics(metrics: Record<string, never>) {
+    private validateEmptyBodyMetric(metrics: Record<string, string | number | boolean | Date>) {
         if (Object.keys(metrics).length != 0) {
-            throw new ValidationError('metrics', 'Invalid metrics', 'INVALID_METRICS');
+                throw new ValidationError('metrics', 'Should not need extra information', 'INVALID_METRICS');
         }
     }
 
-    private validateLoginWithProviderMetrics(metrics: Record<string, never>) {
+    private validateLoginWithProviderMetrics(metrics: Record<string, string | number | boolean | Date>) {
         this.validateSuccessMetric(metrics);
     }
 
-    private validateBlockedMetrics(metrics: Record<string, never>) {
+    private validateBlockedMetrics(metrics: Record<string, string | number | boolean | Date>) {
         if ('blocked' in metrics) {
             if (typeof metrics.blocked !== 'boolean') {
                 throw new ValidationError('metrics', '"blocked" must be a boolean', 'INVALID_BLOCKED');
             }
         } else {
             throw new ValidationError('metrics', '"blocked" is required', 'MISSING_FIELD');
+        }
+    }
+
+    private validateTwitMetrics(params: Params) {
+        if (params.type === 'twit' || params.type === 'like' || params.type === 'retwit' || params.type === 'comment') {
+            if (!params.username) {
+                throw new ValidationError('username', 'Username is required', 'MISSING_FIELD');
+            }
         }
     }
 }
