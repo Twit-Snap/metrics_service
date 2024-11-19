@@ -1,13 +1,13 @@
 import { Pool, QueryResult, QueryResultRow } from 'pg';
 import {DatabasePool} from "./db";
 import {
-    MetricDataDto,
-    Metric,
-    RegisterMetric,
-    LoginMetric,
-    LoginWithProviderMetric,
-    BlockedMetric,
-    TwitMetric
+  MetricDataDto,
+  Metric,
+  RegisterMetric,
+  LoginMetric,
+  LoginWithProviderMetric,
+  BlockedMetric,
+  TwitMetric, RegisterWithProviderMetric
 } from '../types/metric';
 
 export class MetricsRepository {
@@ -17,6 +17,8 @@ export class MetricsRepository {
     this.pool = pool || DatabasePool.getInstance();
   }
   async createMetric(metricsData: MetricDataDto): Promise<Metric> {
+
+
     const { createdAt, type, username, metrics } = metricsData;
     const query = `
             INSERT INTO metrics (created_at, metric_type, username, metrics)
@@ -31,6 +33,10 @@ export class MetricsRepository {
       metrics
     ]);
     return result.rows[0];
+  }
+
+  private formatedDate(createdAt: Date) {
+    return createdAt.toISOString().split('T')[0];
   }
 
   async getRegisterMetrics(): Promise<RegisterMetric[]> {
@@ -54,7 +60,7 @@ export class MetricsRepository {
     return result.rows;
   }
 
-  async getRegisterWithProviderMetrics(): Promise<LoginWithProviderMetric[]> {
+  async getRegisterWithProviderMetrics(): Promise<RegisterWithProviderMetric[]> {
     const query = `
         SELECT 
             DATE(created_at) AS "date",
@@ -70,8 +76,7 @@ export class MetricsRepository {
             DATE(created_at);
     `;
 
-    const result: QueryResult<LoginWithProviderMetric> = await this.pool.query(query);
-
+    const result: QueryResult<RegisterWithProviderMetric> = await this.pool.query(query);
     return result.rows;
   }
 
@@ -158,7 +163,6 @@ export class MetricsRepository {
     `;
 
     const result: QueryResult<T> = await this.pool.query(query, [metricType, username]);
-
     return result.rows;
   }
 
