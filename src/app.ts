@@ -5,7 +5,6 @@ import {DatabasePool} from "./repository/db";
 import metricRoutes from './routes/routes';
 import { errorHandler } from './middleware/errorHandler';
 
-// Función para inicializar el entorno
 function initializeEnvironment() {
     // Determine environment
     const env = process.env.NODE_ENV || 'development';
