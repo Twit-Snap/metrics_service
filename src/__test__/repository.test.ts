@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config({path: '../../.env.dev'});
 
 
+
 describe('Metrics Repository', () => {
   let pool: Pool;
 
@@ -195,7 +196,7 @@ describe('Metrics Repository', () => {
       };
 
       await metricsRepository.createMetric(metricData);
-      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser');
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'week');
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
@@ -216,7 +217,7 @@ describe('Metrics Repository', () => {
         await metricsRepository.createMetric(metricData);
         await metricsRepository.createMetric(metricData);
 
-        const metrics = await metricsRepository.getTwitMetricsByUsername('testuser');
+        const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'week');
         expect(metrics).toBeDefined();
         expect(metrics.length).toBeGreaterThan(0);
         expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
@@ -229,14 +230,14 @@ describe('Metrics Repository', () => {
 
       const aMetricData: MetricDataDto = {
         type: 'twit',
-        createdAt: new Date("2024-11-12"),
+        createdAt: new Date('2024-11-21'),
         username: 'testuser',
         metrics: {}
       };
 
       const anotherMetricData: MetricDataDto = {
         type: 'twit',
-        createdAt: new Date("2024-11-13"),
+        createdAt: new Date('2024-11-22'),
         username: 'testuser',
         metrics: {}
       };
@@ -245,7 +246,10 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(aMetricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser');
+      const actuaDate = new Date('2024-11-21');
+
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'week',actuaDate);
+      console.log('metrics: ', metrics);
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].date.toISOString().split('T')[0]).toBe(aMetricData.createdAt.toISOString().split('T')[0]);
@@ -265,7 +269,7 @@ describe('Metrics Repository', () => {
       };
 
       await metricsRepository.createMetric(metricData);
-      const metrics = await metricsRepository.getLikeMetricsByUsername('testuser');
+      const metrics = await metricsRepository.getLikeMetricsByUsername('testuser', 'week');
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
@@ -284,8 +288,9 @@ describe('Metrics Repository', () => {
         metrics: {}
       };
 
+
       await metricsRepository.createMetric(metricData);
-      const metrics = await metricsRepository.getRetwitMetricsByUsername('testuser');
+      const metrics = await metricsRepository.getRetwitMetricsByUsername('testuser', 'week');
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
@@ -305,15 +310,113 @@ describe('Metrics Repository', () => {
       };
 
       await metricsRepository.createMetric(metricData);
-      const metrics = await metricsRepository.getCommentMetricsByUsername('testuser');
+      const metrics = await metricsRepository.getCommentMetricsByUsername('testuser', 'week');
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
       expect(metrics[0].amount).toBe(1);
-
-
     });
 
 
+
+    it('should return only metrics from the last week', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const baseDate = new Date('2024-11-12');
+      const nextWeek = new Date(baseDate);
+      nextWeek.setDate(baseDate.getDate() + 7);
+
+
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: baseDate,
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: nextWeek,
+        username: 'testuser',
+        metrics: {}
+      };
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'week', baseDate);
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(1);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
+      expect(metrics[0].amount).toBe(2);
+    });
+
+    it('should return metrics only from last month', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const baseDate = new Date('2024-11-12');
+      const nextMonth = new Date(baseDate);
+      nextMonth.setDate(baseDate.getDate() + 30);
+
+
+
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: baseDate,
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: nextMonth,
+        username: 'testuser',
+        metrics: {}
+      };
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'month', baseDate);
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(1);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(metricData.createdAt.toISOString().split('T')[0]);
+      expect(metrics[0].amount).toBe(2);
+
+    });
+
+    it('should return metrics only from last year', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const beginOfMonth = new Date('2024-11-01');
+      const baseDate = new Date('2024-11-12');
+      const nextYear = new Date(baseDate);
+      nextYear.setDate(baseDate.getDate() + 365);
+
+
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: baseDate,
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: nextYear,
+        username: 'testuser',
+        metrics: {}
+      };
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'year', baseDate);
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(1);
+
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(beginOfMonth.toISOString().split('T')[0]);
+      expect(metrics[0].amount).toBe(2);
+    });
   });
 });

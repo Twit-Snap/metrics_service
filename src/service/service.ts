@@ -35,13 +35,14 @@ export class MetricService {
         }else if(params.type == 'blocked') {
             metrics = await this.metricsRepository.getBlockedMetrics();
         }else if (params.type == 'twit'){
-            metrics = await this.metricsRepository.getTwitMetricsByUsername(params.username);
+            metrics = await this.metricsRepository.getTwitMetricsByUsername(params.username, params.dateRange);
         }else if (params.type == 'like') {
-            metrics = await this.metricsRepository.getLikeMetricsByUsername(params.username);
+            console.log('entre en like');
+            metrics = await this.metricsRepository.getLikeMetricsByUsername(params.username, params.dateRange);
         }else if (params.type == 'retwit') {
-            metrics = await this.metricsRepository.getRetwitMetricsByUsername(params.username);
+            metrics = await this.metricsRepository.getRetwitMetricsByUsername(params.username, params.dateRange);
         }else if(params.type == 'comment') {
-            metrics = await this.metricsRepository.getCommentMetricsByUsername(params.username);
+            metrics = await this.metricsRepository.getCommentMetricsByUsername(params.username, params.dateRange);
         }
 
         return metrics

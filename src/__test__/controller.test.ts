@@ -806,5 +806,42 @@ describe('Metrics API Tests', () => {
       expect(response.body.data.length).toBe(0);
     });
 
+    it('should get metrics of likes by username and date range', async () => {
+      const baseDate = new Date();
+      const nextDay = new Date(baseDate);
+      const nextWeek = new Date(baseDate);
+      nextWeek.setDate(baseDate.getDate() + 7);
+      nextDay.setDate(baseDate.getDate() + 1);
+
+      const metricData = {
+        type: 'like',
+        createdAt: nextDay.toISOString(),
+        username: 'user4',
+        metrics: {}
+      };
+
+      const anotherMetricData = {
+        type: 'like',
+        createdAt: nextWeek.toISOString(),
+        username: 'user4',
+        metrics: {}
+      };
+
+      const aMetric = await request(app).post('/metrics').send(metricData);
+      const anotherMetric  = await request(app).post('/metrics').send(anotherMetricData);
+      console.log('valid metric', aMetric);
+      console.log('invalid metric', anotherMetric.body.data);
+
+
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'like', dateRange: 'week', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBe(2);
+    });
   });
+
+
 });

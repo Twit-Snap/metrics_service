@@ -52,9 +52,11 @@ export interface TwitMetric {
     amount: number
 }
 
+export type DateRange = 'week' | 'month' | 'year';
 
 export type Params = {
     type: string,
     username?: string
+    dateRange?: DateRange;
 }
 

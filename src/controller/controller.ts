@@ -1,5 +1,5 @@
 import {MetricService} from '../service/service';
-import {MetricDataDto} from "../types/metric";
+import { DateRange, MetricDataDto } from '../types/metric';
 import {NextFunction, Request, Response} from 'express';
 import {ValidationError} from "../types/customErrors";
 import {Params} from "../types/metric";
@@ -25,21 +25,25 @@ export class MetricController {
     }
 
     async getMetrics(req: Request, res: Response, next: NextFunction) {
+
+        const validDateRanges: DateRange[] = ['week', 'month', 'year'];
         try {
             const params: Params = {
                 type: req.query.type ? req.query.type.toString() : '',
-                username: req.query.username ? req.query.username.toString() : ''
+                username: req.query.username ? req.query.username.toString() : '',
+                dateRange: validDateRanges.includes(req.query.dateRange?.toString() as DateRange)
+                  ? (req.query.dateRange?.toString() as DateRange) : 'week'
             };
             this.validateTwitMetrics(params);
+            console.log('params', params);
             const metrics = await this.metricService.getMetrics(params);
+            console.log('metrics', metrics);
             res.status(200).json({data: metrics});
         }
         catch (error) {
             next(error);
         }
     }
-
-
 
     private validateParameters(metricsData: MetricDataDto) {
 
@@ -51,7 +55,6 @@ export class MetricController {
         if (!metricsData.type) {
             throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
         }
-
         this.validateMetrics(metricsData);
     }
 
