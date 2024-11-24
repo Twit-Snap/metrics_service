@@ -56,6 +56,15 @@ export interface LocationMetric {
   amount: number;
 }
 
+export interface FollowMetric {
+  date: Date;
+  amount: number;
+}
+
+export interface TotalFollowMetric {
+  follows: FollowMetric[];
+  total: number;
+}
 export type DateRange = 'week' | 'month' | 'year';
 
 export type ParamType =
@@ -68,7 +77,8 @@ export type ParamType =
   | 'like'
   | 'retwit'
   | 'comment'
-  | 'location';
+  | 'location'
+  | 'follow';
 
 export const PARAM_TYPES: ParamType[] = [
   'register',
@@ -81,6 +91,7 @@ export const PARAM_TYPES: ParamType[] = [
   'retwit',
   'comment',
   'location',
+  'follow',
 ];
 
 export type Params = {

@@ -34,10 +34,9 @@ export class MetricController {
           : 'week'
       };
       this.validateTwitMetrics(params);
-      this.validateParams(params);
-      console.log('params', params);
+      this.validateParamsType(params);
       const metrics = await this.metricService.getMetrics(params);
-      console.log('metrics', metrics);
+      console.log('GET metrics', metrics);
       res.status(200).json({ data: metrics });
     } catch (error) {
       next(error);
@@ -79,6 +78,8 @@ export class MetricController {
       this.validateBlockedMetrics(metricsData.metrics);
     } else if (metricsData.type === 'location') {
       this.validateLocationMetrics(metricsData);
+    }else if(metricsData.type === 'follow') {
+      this.validateFollowMetric(metricsData.metrics);
     } else {
       throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
     }
@@ -169,9 +170,29 @@ export class MetricController {
     }
   }
 
-  private validateParams(params: Params) {
+  private validateParamsType(params: Params) {
     if (!PARAM_TYPES.includes(params.type as ParamType)) {
       throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
+    }
+  }
+
+  private validateFollowMetric(metrics: Record<string, string | number | boolean | Date>) {
+    if ('followed' in metrics) {
+      if (typeof metrics.followed !== 'boolean') {
+        throw new ValidationError('metrics', '"followed" must be a boolean', 'INVALID_FOLLOWED');
+      }
+    } else {
+      throw new ValidationError('metrics', '"followed" is required', 'MISSING_FIELD');
+    }
+    if ('amount' in metrics) {
+      if (typeof metrics.amount !== 'number') {
+        throw new ValidationError('metrics', '"amount" must be a number', 'INVALID_AMOUNT');
+      }
+      if(metrics.amount < 0){
+        throw new ValidationError('metrics', '"amount" must be a positive number', 'INVALID_AMOUNT');
+      }
+    } else {
+      throw new ValidationError('metrics', '"amount" is required', 'MISSING_FIELD');
     }
   }
 }

@@ -24,7 +24,7 @@ describe('Metrics Repository', () => {
   });
 
   describe('createMetric', () => {
-    it('should create a new metric', async () => {
+    it('should create a new register metric', async () => {
       const metricsRepository = new MetricsRepository(pool);
 
       const metricData: MetricDataDto = {
@@ -35,6 +35,197 @@ describe('Metrics Repository', () => {
           success: true,
           event_time: 1000
         }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new metric with provider', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'register_with_provider',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          success: true
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+    it('should create a new login metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'login',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 1000
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new login with provider metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'login_with_provider',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          success: true
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new blocked metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'blocked',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          blocked: true
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new twit metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new like metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'like',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new retwit metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'retwit',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new comment metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'comment',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new metric with location', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'location',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          latitude: 10,
+          longitude: 10
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new metric with follow', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {}
       };
 
       const metric = await metricsRepository.createMetric(metricData);
@@ -478,7 +669,6 @@ describe('Metrics Repository', () => {
       expect(metrics[0].amount).toBe(2);
     });
 
-
     it('should return metrics with the country', async () => {
       const metricsRepository = new MetricsRepository(pool);
 
@@ -520,7 +710,6 @@ describe('Metrics Repository', () => {
         }
       };
 
-
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
@@ -532,6 +721,114 @@ describe('Metrics Repository', () => {
       expect(metrics[1].country).toBe('United States');
       expect(metrics[0].amount).toBe(1);
       expect(metrics[1].amount).toBe(2);
+    });
+
+    it('should return complete follow metrics by username in the same date', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {
+          followed: true,
+          amount: 1
+        }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+
+      const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week');
+      expect(metrics).toBeDefined();
+      expect(metrics.total).toBe(3);
+      expect(metrics.follows[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics.follows[0].amount).toBe(3);
+    });
+
+    it('should return complete follow metrics by username in different dates', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const today = new Date('2024-11-10');
+      const yesterday = new Date('2024-11-9');
+
+      const metricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: today,
+        username: 'testuser',
+        metrics: {
+          followed: true,
+          amount: 1
+        }
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: yesterday,
+        username: 'testuser',
+        metrics: {
+          followed: true,
+          amount: 1
+        }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+
+
+      const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
+      expect(metrics).toBeDefined();
+      expect(metrics.total).toBe(3);
+      expect(metrics.follows[0].date.toISOString().split('T')[0]).toBe(
+        anotherMetricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics.follows[0].amount).toBe(1);
+
+      expect(metrics.follows[1].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics.follows[1].amount).toBe(2);
+    });
+
+    it('should return complete follow metrics by username in different dates with an unfollow action', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const today = new Date('2024-11-10');
+
+      const metricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: today,
+        username: 'testuser',
+        metrics: {
+          followed: true,
+          amount: 1
+        }
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'follow',
+        createdAt: today,
+        username: 'testuser',
+        metrics: {
+          followed: false,
+          amount: 1
+        }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+
+      const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
+      expect(metrics).toBeDefined();
+      expect(metrics.total).toBe(0);
+      expect(metrics.follows[0].date.toISOString().split('T')[0]).toBe(
+        anotherMetricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics.follows[0].amount).toBe(1);
 
     });
   });
