@@ -234,16 +234,18 @@ export class MetricsRepository {
 
   async getLocationMetrics(): Promise<LocationMetric[]> {
     const query = `
-        SELECT 
-            created_at AS "date",
-            (metrics->>'country')::text AS "country"
-        FROM 
-            metrics
-        WHERE 
-            metric_type = 'location'
-        ORDER BY 
-            created_at;
-    `;
+      SELECT 
+          (metrics->>'country')::text AS "country",
+          COUNT(*)::int AS "amount"
+      FROM 
+          metrics
+      WHERE 
+          metric_type = 'location'
+      GROUP BY 
+          (metrics->>'country')::text
+      ORDER BY 
+          "amount" ASC;
+  `;
 
     const result: QueryResult<LocationMetric> = await this.pool.query(query);
 

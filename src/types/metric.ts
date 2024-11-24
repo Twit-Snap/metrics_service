@@ -52,8 +52,8 @@ export interface TwitMetric {
 }
 
 export interface LocationMetric {
-  date: Date;
   country: string;
+  amount: number;
 }
 
 export type DateRange = 'week' | 'month' | 'year';

@@ -819,5 +819,47 @@ describe('Metrics API Tests', () => {
       expect(response.body.type).toBe('INVALID_TYPE');
       expect(response.body.detail).toBe('Invalid type');
     });
+
+    it('should get location metrics group by country', async () => {
+
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          //Brasil
+          latitude: -22.9068,
+          longitude: -43.1729,
+        }
+      }
+
+      const anotherMetricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        //Argentina
+        metrics: {
+          latitude: -34.61315,
+          longitude: -58.37723,
+        }
+      }
+
+      const a = await request(app).post('/metrics').send(metricData);
+      const b = await request(app).post('/metrics').send(metricData);
+      const c = await request(app).post('/metrics').send(anotherMetricData);
+
+      console.log(a.body);
+      console.log(b.body);
+      console.log(c.body);
+      const response = await request(app).get('/metrics').query({ type: 'location' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].country).toBe('Argentina');
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data[1].country).toBe('Brasil');
+      expect(response.body.data[1].amount).toBe(2);
+
+      expect(response.body.data.length).toBe(2);
+    });
   });
 });

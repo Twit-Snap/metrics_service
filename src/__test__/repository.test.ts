@@ -3,7 +3,6 @@ import { DatabasePool } from '../repository/db';
 import { MetricsRepository } from '../repository/repository';
 import { MetricDataDto } from '../types/metric';
 import dotenv from 'dotenv';
-import { ValidationError } from '../types/customErrors';
 
 dotenv.config({ path: '../../.env.dev' });
 
@@ -497,6 +496,43 @@ describe('Metrics Repository', () => {
       expect(metrics).toBeDefined();
       expect(metrics.length).toBeGreaterThan(0);
       expect(metrics[0].country).toBe('United States');
+      expect(metrics[0].amount).toBe(1);
+    });
+
+    it('should return metrics group by the country', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'location',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {
+          country: 'United States'
+        }
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'location',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {
+          country: 'Argentina'
+        }
+      };
+
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+
+      const metrics = await metricsRepository.getLocationMetrics();
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(2);
+      expect(metrics[0].country).toBe('Argentina');
+      expect(metrics[1].country).toBe('United States');
+      expect(metrics[0].amount).toBe(1);
+      expect(metrics[1].amount).toBe(2);
+
     });
   });
 });
