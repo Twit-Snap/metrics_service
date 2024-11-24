@@ -1,16 +1,17 @@
-@url = http://localhost:4000
+//@url =https://metricsservice-production.up.railway.app
+@url =http://localhost:4000
 
 ### POST Create register metric
 POST {{url}}/metrics
 Content-Type: application/json
 
 {
-    "createdAt": "2021-10-02",
+    "createdAt": "2024-11-06",
     "type": "register",
     "username": "usernameTest",
     "metrics": {
-      "registration_time": 10,
-      "success": true
+      "event_time": 10000,
+      "success": false
     }
 }
 
@@ -23,7 +24,7 @@ Content-Type: application/json
   "type": "register_with_provider",
   "username": "usernameTest",
   "metrics": {
-    "provider": "facebook"
+    "provider": "google"
   }
 }
 
@@ -55,6 +56,19 @@ Content-Type: application/json
   }
 }
 
+### POST Create login with provider
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2024-11-24",
+  "type": "blocked",
+  "username": "usernameTest",
+  "metrics": {
+    "blocked": true
+  }
+}
+
 ### GET register metrics
 GET {{url}}/metrics/register?type=register
 Content-Type: application/json
@@ -71,3 +85,20 @@ Content-Type: application/json
 GET {{url}}/metrics/register?type=login_with_provider
 Content-Type: application/json
 
+### POST Create location metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2024-11-06",
+  "type": "location",
+  "username": "usernameTest",
+  "metrics": {
+    "latitude":-34.61315,
+    "longitude":-58.37723
+  }
+}
+
+### GET location metrics
+GET {{url}}/metrics?type=location
+Content-Type: application/json

@@ -1,53 +1,90 @@
-
 export type MetricDataDto = {
-    createdAt: Date;
-    type: string;
-    username: string;
-    metrics: Record<string, never>;
-}
+  createdAt: Date;
+  type: string;
+  username: string;
+  metrics: Record<string, string | number | boolean | Date>;
+};
 
 export interface Metric {
-    id: number;
-    createdAt: Date;
-    type: string;
-    username: string;
-    metrics: Record<string, never>;
+  id: number;
+  createdAt: Date;
+  type: string;
+  username: string;
+  metrics: Record<string, string | number | boolean | Date>;
 }
-
 
 export interface RegisterMetric {
-    date: Date;
-    registerUsers: number;
-    averageRegistrationTime: number;
-    successRate: number;
+  date: Date;
+  registerUsers: number;
+  averageRegistrationTime: number;
+  successRate: number;
 }
 
-export interface RegisterFederatedIdentityMetric {
-    date: string;
-    successfulRegisters: number;
-    successfulRegistersWithProvider: number;
+export interface RegisterWithProviderMetric {
+  date: Date;
+  successfulRegisters: number;
+  successfulRegistersWithProvider: number;
 }
 
-export interface LoginMetric{
-    date: Date,
-    loginUsers: number,
-    successfulLogins: number,
-    failedLoginAttempt: number,
-    averageLoginTime: number
+export interface LoginMetric {
+  date: Date;
+  loginUsers: number;
+  successfulLogins: number;
+  failedLoginAttempts: number;
+  averageLoginTime: number;
 }
 
 export interface LoginWithProviderMetric {
-    date: Date,
-    successfulLogins: number;
-    successfulLoginsWithProvider: number;
+  date: Date;
+  successfulLogins: number;
+  successfulLoginsWithProvider: number;
 }
 
-export interface BlockedMetric{
-    date: Date,
-    blockedUsers: number
+export interface BlockedMetric {
+  date: Date;
+  blockedUsers: number;
 }
+
+export interface TwitMetric {
+  dateName: string;
+  date: Date;
+  amount: number;
+}
+
+export interface LocationMetric {
+  country: string;
+  amount: number;
+}
+
+export type DateRange = 'week' | 'month' | 'year';
+
+export type ParamType =
+  | 'register'
+  | 'register_with_provider'
+  | 'login'
+  | 'login_with_provider'
+  | 'blocked'
+  | 'twit'
+  | 'like'
+  | 'retwit'
+  | 'comment'
+  | 'location';
+
+export const PARAM_TYPES: ParamType[] = [
+  'register',
+  'register_with_provider',
+  'login',
+  'login_with_provider',
+  'blocked',
+  'twit',
+  'like',
+  'retwit',
+  'comment',
+  'location',
+];
 
 export type Params = {
-    type: string,
-}
-
+  type: string;
+  username?: string;
+  dateRange?: DateRange;
+};

@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import { ValidationError } from "../types/customErrors";
+import { ServiceUnavailableError, ValidationError } from '../types/customErrors';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
@@ -15,6 +15,14 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
             detail: err.detail,
             instance: req.originalUrl,
             'custom-field': err.field
+        });
+    } else if (err instanceof ServiceUnavailableError) {
+        console.warn(`ServiceUnavailableError: ${err.message}`);
+        res.status(503).json({
+            title: 'Service Unavailable Error',
+            status: 503,
+            detail: err.message,
+            instance: req.originalUrl,
         });
     } else {
         res.status(500).json({

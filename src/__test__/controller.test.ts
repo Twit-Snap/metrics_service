@@ -35,17 +35,14 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.metric_type).toBe('register');
+      expect(response.body.data.type).toBe('register');
       expect(response.body.data.username).toBe('testuser');
-      expect(response.body.data.created_at).toBe(metricData.createdAt);
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.success).toBe(true);
       expect(response.body.data.metrics.event_time).toBe(1000);
-
     });
 
     it('should create a login metric', async () => {
@@ -59,14 +56,12 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.metric_type).toBe('login');
+      expect(response.body.data.type).toBe('login');
       expect(response.body.data.username).toBe('testuser');
-      expect(response.body.data.created_at).toBe(metricData.createdAt);
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.success).toBe(true);
       expect(response.body.data.metrics.event_time).toBe(500);
     });
@@ -79,14 +74,12 @@ describe('Metrics API Tests', () => {
         metrics: {}
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.metric_type).toBe('register_with_provider');
+      expect(response.body.data.type).toBe('register_with_provider');
       expect(response.body.data.username).toBe('testuser');
-      expect(response.body.data.created_at).toBe(metricData.createdAt);
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
     });
 
     it('should create a login with provider metric', async () => {
@@ -95,18 +88,16 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          success: true,
+          success: true
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.metric_type).toBe(metricData.type);
+      expect(response.body.data.type).toBe(metricData.type);
       expect(response.body.data.username).toBe('testuser');
-      expect(response.body.data.created_at).toBe(metricData.createdAt);
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.success).toBe(true);
     });
 
@@ -116,18 +107,16 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          blocked: true,
+          blocked: true
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.metric_type).toBe('blocked');
+      expect(response.body.data.type).toBe('blocked');
       expect(response.body.data.username).toBe('testuser');
-      expect(response.body.data.created_at).toBe(metricData.createdAt);
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
     });
 
     it('should return 400 for invalid metric type', async () => {
@@ -141,14 +130,11 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.detail).toBe('Invalid type');
       expect(response.body.type).toBe('INVALID_TYPE');
-
     });
 
     it('should return 400 for missing metrics', async () => {
@@ -158,9 +144,7 @@ describe('Metrics API Tests', () => {
         username: 'testuser'
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_METRICS');
@@ -177,14 +161,11 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_TYPE');
       expect(response.body.detail).toBe('Invalid type');
-
     });
 
     it('should return 400 for invalid createdAt', async () => {
@@ -198,9 +179,7 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_CREATED_AT');
@@ -218,9 +197,7 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_SUCCESS');
@@ -237,16 +214,12 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('MISSING_FIELD');
       expect(response.body.detail).toBe('"success" is required');
-
     });
-
 
     it('should return 400 for invalid event_time metric', async () => {
       const metricData = {
@@ -259,15 +232,12 @@ describe('Metrics API Tests', () => {
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_EVENT_TIME');
       expect(response.body.detail).toBe('"event_time" must be a number');
     });
-
 
     it('should return 400 without event_time metric', async () => {
       const metricData = {
@@ -275,19 +245,16 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          success: true,
+          success: true
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('MISSING_FIELD');
       expect(response.body.detail).toBe('"event_time" is required');
     });
-
 
     it('should return 400 for invalid success metric with login_with_provider', async () => {
       const metricData = {
@@ -295,13 +262,11 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          success: 'invalid',
+          success: 'invalid'
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
     });
@@ -312,13 +277,11 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          blocked: 'invalid',
+          blocked: 'invalid'
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_BLOCKED');
@@ -330,13 +293,10 @@ describe('Metrics API Tests', () => {
         type: 'blocked',
         createdAt: new Date().toISOString(),
         username: 'testuser',
-        metrics: {
-        }
+        metrics: {}
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('MISSING_FIELD');
@@ -349,26 +309,281 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          invalid: 'invalid',
+          invalid: 'invalid'
         }
       };
 
-      const response = await request(app)
-        .post('/metrics')
-        .send(metricData);
+      const response = await request(app).post('/metrics').send(metricData);
 
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_METRICS');
-      expect(response.body.detail).toBe('Invalid metrics');
+      expect(response.body.detail).toBe('Should not need extra information');
     });
 
+    it('should create a twit metric', async () => {
+      const metricData = {
+        type: 'twit',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('twit');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+    });
+
+    it('should create a like metric', async () => {
+      const metricData = {
+        type: 'like',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('like');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+    });
+
+    it('should create a retwit metric', async () => {
+      const metricData = {
+        type: 'retwit',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('retwit');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+    });
+
+    it('should create a comment metric', async () => {
+      const metricData = {
+        type: 'comment',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('comment');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+    });
+
+    it('should return 400 for invalid metrics with twit', async () => {
+      const metricData = {
+        type: 'twit',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          invalid: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_METRICS');
+      expect(response.body.detail).toBe('Should not need extra information');
+    });
+
+    it('should return 400 for invalid metrics with like', async () => {
+      const metricData = {
+        type: 'like',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          invalid: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_METRICS');
+      expect(response.body.detail).toBe('Should not need extra information');
+    });
+
+    it('should return 400 for invalid metrics with retwit', async () => {
+      const metricData = {
+        type: 'retwit',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          invalid: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_METRICS');
+      expect(response.body.detail).toBe('Should not need extra information');
+    });
+
+    it('should create a location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: -22.9068,
+          longitude: -43.1729,
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('location');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+      expect(response.body.data.metrics.latitude).toBe(-22.9068);
+      expect(response.body.data.metrics.longitude).toBe(-43.1729);
+      expect(response.body.data.metrics.country).toBe('Brasil');
+    });
+
+    it('should return 400 for invalid metrics with comment', async () => {
+      const metricData = {
+        type: 'comment',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          invalid: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_METRICS');
+      expect(response.body.detail).toBe('Should not need extra information');
+    });
+
+    it('should raise 400 if latitude is missing in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          longitude: 0
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('"latitude" is required');
+    });
+
+    it('should raise 400 if longitude is missing in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: 0
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('"longitude" is required');
+    });
+
+    it('should raise 400 if latitude is not a number in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: 'invalid',
+          longitude: 0
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_LATITUDE');
+      expect(response.body.detail).toBe('"latitude" must be a number');
+    });
+
+    it('should raise 400 if longitude is not a number in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: 0,
+          longitude: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_LONGITUDE');
+      expect(response.body.detail).toBe('"longitude" must be a number');
+    });
+
+    it('should raise 400 if latitude is out of range in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: -91,
+          longitude: 0
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_COORDINATES');
+      expect(response.body.detail).toBe('Invalid coordinates');
+    });
+
+    it('should raise 400 if longitude is out of range in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: 0,
+          longitude: 181
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_COORDINATES');
+      expect(response.body.detail).toBe('Invalid coordinates');
+    });
 
   });
 
-
   describe('GET /metrics', () => {
     beforeEach(async () => {
-      // Insertar datos de prueba
       const testData = [
         {
           type: 'register',
@@ -392,13 +607,37 @@ describe('Metrics API Tests', () => {
           type: 'login_with_provider',
           created_at: new Date().toISOString(),
           username: 'user2',
-          metrics: { success: true}
+          metrics: { success: true }
         },
         {
           type: 'blocked',
           created_at: new Date().toISOString(),
           username: 'user3',
           metrics: { blocked: true }
+        },
+        {
+          type: 'twit',
+          created_at: new Date().toISOString(),
+          username: 'user4',
+          metrics: {}
+        },
+        {
+          type: 'like',
+          created_at: new Date().toISOString(),
+          username: 'user4',
+          metrics: {}
+        },
+        {
+          type: 'retwit',
+          created_at: new Date().toISOString(),
+          username: 'user4',
+          metrics: {}
+        },
+        {
+          type: 'comment',
+          created_at: new Date().toISOString(),
+          username: 'user4',
+          metrics: {}
         }
       ];
 
@@ -411,9 +650,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get register metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'register' });
+      const response = await request(app).get('/metrics').query({ type: 'register' });
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
@@ -423,13 +660,10 @@ describe('Metrics API Tests', () => {
       expect(response.body.data[0]).toHaveProperty('successRate');
 
       expect(response.body.data.length).toBe(1);
-
     });
 
     it('should get valid register metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'register' });
+      const response = await request(app).get('/metrics').query({ type: 'register' });
 
       expect(response.status).toBe(200);
       expect(response.body.data[0].registerUsers).toBe(1);
@@ -439,9 +673,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get valid login metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'login' });
+      const response = await request(app).get('/metrics').query({ type: 'login' });
       console.log(response.body.data[0]);
 
       expect(response.status).toBe(200);
@@ -450,28 +682,22 @@ describe('Metrics API Tests', () => {
       expect(response.body.data[0].failedLoginAttempts).toBe(0);
       expect(response.body.data[0].averageLoginTime).toBe(500);
       expect(response.body.data.length).toBe(1);
-
     });
 
     it('should get login metrics with correct structure', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'login' });
+      const response = await request(app).get('/metrics').query({ type: 'login' });
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
       expect(response.body.data[0]).toHaveProperty('loginUsers');
-      expect(response.body.data[0]).toHaveProperty('date')
+      expect(response.body.data[0]).toHaveProperty('date');
       expect(response.body.data[0]).toHaveProperty('successfulLogins');
       expect(response.body.data[0]).toHaveProperty('averageLoginTime');
       expect(response.body.data[0]).toHaveProperty('failedLoginAttempts');
-
     });
 
     it('should get login with provider metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'login_with_provider' });
+      const response = await request(app).get('/metrics').query({ type: 'login_with_provider' });
 
       console.log(response.body.data[0]);
 
@@ -482,9 +708,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get login with provider metrics with correct structure', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'login_with_provider' });
+      const response = await request(app).get('/metrics').query({ type: 'login_with_provider' });
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
@@ -494,9 +718,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get register with provider metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'register_with_provider' });
+      const response = await request(app).get('/metrics').query({ type: 'register_with_provider' });
 
       expect(response.status).toBe(200);
       expect(response.body.data[0].successfulRegisters).toBe(1);
@@ -505,9 +727,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get blocked metrics', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'blocked' });
+      const response = await request(app).get('/metrics').query({ type: 'blocked' });
 
       expect(response.status).toBe(200);
       expect(response.body.data[0].blockedUsers).toBe(1);
@@ -515,9 +735,7 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get blocked metrics with correct structure', async () => {
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'blocked' });
+      const response = await request(app).get('/metrics').query({ type: 'blocked' });
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
@@ -525,18 +743,156 @@ describe('Metrics API Tests', () => {
       expect(response.body.data[0]).toHaveProperty('date');
     });
 
+    it('should get twit metric by username', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'twit', username: 'user4' });
 
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data.length).toBe(1);
+    });
+
+    it('should get twit metric by username with correct structure', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'twit', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data[0]).toHaveProperty('amount');
+      expect(response.body.data[0]).toHaveProperty('date');
+    });
+
+    it('should get retwit metric by username', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'retwit', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data.length).toBe(1);
+    });
+
+    it('should get retwit metric by username with correct structure', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'retwit', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data[0]).toHaveProperty('amount');
+      expect(response.body.data[0]).toHaveProperty('date');
+    });
+
+    it('should get like metric by username', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'like', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data.length).toBe(1);
+    });
+
+    it('should get like metric by username with correct structure', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'like', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data[0]).toHaveProperty('amount');
+      expect(response.body.data[0]).toHaveProperty('date');
+    });
+
+    it('should get comment metric by username', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'comment', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data.length).toBe(1);
+    });
+
+    it('should get comment metric by username with correct structure', async () => {
+      const response = await request(app)
+        .get('/metrics')
+        .query({ type: 'comment', username: 'user4' });
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data[0]).toHaveProperty('amount');
+      expect(response.body.data[0]).toHaveProperty('date');
+    });
+
+    it('should return 400 for undefined username with twit metric', async () => {
+      const response = await request(app).get('/metrics').query({ type: 'twit' });
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('Username is required');
+    });
 
     it('should handle empty results', async () => {
       await pool.query('DELETE FROM metrics');
 
-      const response = await request(app)
-        .get('/metrics')
-        .query({ type: 'register' });
+      const response = await request(app).get('/metrics').query({ type: 'register' });
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.data)).toBe(true);
       expect(response.body.data.length).toBe(0);
+    });
+
+    it('should return 400 for invalid type', async () => {
+      const response = await request(app).get('/metrics').query({
+        type: 'invalid',
+        username: 'user4'
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_TYPE');
+      expect(response.body.detail).toBe('Invalid type');
+    });
+
+    it('should get location metrics group by country', async () => {
+
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          //Brasil
+          latitude: -22.9068,
+          longitude: -43.1729,
+        }
+      }
+
+      const anotherMetricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        //Argentina
+        metrics: {
+          latitude: -34.61315,
+          longitude: -58.37723,
+        }
+      }
+
+      const a = await request(app).post('/metrics').send(metricData);
+      const b = await request(app).post('/metrics').send(metricData);
+      const c = await request(app).post('/metrics').send(anotherMetricData);
+
+      const response = await request(app).get('/metrics').query({ type: 'location' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].country).toBe('Argentina');
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data[1].country).toBe('Brasil');
+      expect(response.body.data[1].amount).toBe(2);
+
+      expect(response.body.data.length).toBe(2);
     });
   });
 });
