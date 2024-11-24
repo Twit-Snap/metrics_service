@@ -94,8 +94,8 @@ Content-Type: application/json
   "type": "location",
   "username": "usernameTest",
   "metrics": {
-    "lat": -22.9068,
-    "lon":-43.1729
+    "latitude":-34.61315,
+    "longitude":-58.37723
   }
 }
 

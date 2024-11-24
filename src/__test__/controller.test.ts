@@ -544,6 +544,42 @@ describe('Metrics API Tests', () => {
       expect(response.body.detail).toBe('"longitude" must be a number');
     });
 
+    it('should raise 400 if latitude is out of range in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: -91,
+          longitude: 0
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_COORDINATES');
+      expect(response.body.detail).toBe('Invalid coordinates');
+    });
+
+    it('should raise 400 if longitude is out of range in location metric', async () => {
+      const metricData = {
+        type: 'location',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          latitude: 0,
+          longitude: 181
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_COORDINATES');
+      expect(response.body.detail).toBe('Invalid coordinates');
+    });
+
   });
 
   describe('GET /metrics', () => {
@@ -848,9 +884,6 @@ describe('Metrics API Tests', () => {
       const b = await request(app).post('/metrics').send(metricData);
       const c = await request(app).post('/metrics').send(anotherMetricData);
 
-      console.log(a.body);
-      console.log(b.body);
-      console.log(c.body);
       const response = await request(app).get('/metrics').query({ type: 'location' });
 
       expect(response.status).toBe(200);

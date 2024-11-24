@@ -84,6 +84,13 @@ export class MetricController {
     }
   }
 
+
+  private isValidCoordinate(latitude: number, longitude: number): boolean {
+    const isLatitudeValid = latitude >= -90 && latitude <= 90;
+    const isLongitudeValid = longitude >= -180 && longitude <= 180;
+    return isLatitudeValid && isLongitudeValid;
+  }
+
   private validateLocationMetrics(metricsData: MetricDataDto) {
     if ('latitude' in metricsData.metrics) {
       if (typeof metricsData.metrics.latitude !== 'number') {
@@ -98,6 +105,10 @@ export class MetricController {
       }
     } else {
       throw new ValidationError('metrics', '"longitude" is required', 'MISSING_FIELD');
+    }
+
+    if (!this.isValidCoordinate(metricsData.metrics.latitude, metricsData.metrics.longitude)) {
+      throw new ValidationError('metrics', 'Invalid coordinates', 'INVALID_COORDINATES');
     }
   }
 

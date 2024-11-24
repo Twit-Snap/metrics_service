@@ -28,7 +28,8 @@ export class MetricService {
                         lat: metricsData.metrics.latitude,
                         lon: metricsData.metrics.longitude,
                         format: 'json'
-                    }
+                    },
+                    timeout: 5000 // 5 segundos
                 })
                 metricsData.metrics.country = country.data.address.country;
             }catch (error){
