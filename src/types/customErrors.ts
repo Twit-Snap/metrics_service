@@ -10,5 +10,11 @@ export class ValidationError extends Error {
     this.name = 'ValidationError';
     this.type = type;
   }
+}
 
+export class ServiceUnavailableError extends Error {
+  constructor() {
+    super('Service Unavailable Error');
+    this.name = 'ServiceUnavailableError';
+  }
 }

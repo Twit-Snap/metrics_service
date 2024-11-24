@@ -6,8 +6,11 @@ import {
     RegisterWithProviderMetric,
     Params,
     LoginMetric, LoginWithProviderMetric,
-    BlockedMetric, TwitMetric
+    BlockedMetric, TwitMetric, LocationMetric
 } from '../types/metric';
+import axios from 'axios';
+import { ServiceUnavailableError } from '../types/customErrors';
+
 
 
 export class MetricService {
@@ -18,11 +21,26 @@ export class MetricService {
     }
 
     async createMetrics(metricsData: MetricDataDto): Promise<Metric> {
+        if(metricsData.type == 'location'){
+            try{
+                const country = await axios.get(  `${process.env.NOMINATIM_URL ?? 'https://nominatim.openstreetmap.org/reverse'}`, {
+                    params: {
+                        lat: metricsData.metrics.latitude,
+                        lon: metricsData.metrics.longitude,
+                        format: 'json'
+                    }
+                })
+                metricsData.metrics.country = country.data.address.country;
+            }catch (error){
+                console.error(error);
+                throw new ServiceUnavailableError();
+            }
+        }
         return await this.metricsRepository.createMetric(metricsData);
     }
 
-    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterWithProviderMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] > {
-        let metrics: RegisterMetric[] | RegisterWithProviderMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] = [];
+    async getMetrics(params: Params): Promise<RegisterMetric[] | RegisterWithProviderMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] | LocationMetric[] > {
+        let metrics: RegisterMetric[] | RegisterWithProviderMetric[] | LoginMetric[] | LoginWithProviderMetric[] | BlockedMetric[] | TwitMetric[] | LocationMetric[] = [];
 
         if(params.type == 'register'){
             metrics = await this.metricsRepository.getRegisterMetrics();
@@ -37,13 +55,15 @@ export class MetricService {
         }else if (params.type == 'twit'){
             metrics = await this.metricsRepository.getTwitMetricsByUsername(params.username, params.dateRange);
         }else if (params.type == 'like') {
-            console.log('entre en like');
             metrics = await this.metricsRepository.getLikeMetricsByUsername(params.username, params.dateRange);
         }else if (params.type == 'retwit') {
             metrics = await this.metricsRepository.getRetwitMetricsByUsername(params.username, params.dateRange);
         }else if(params.type == 'comment') {
             metrics = await this.metricsRepository.getCommentMetricsByUsername(params.username, params.dateRange);
+        }else if (params.type == 'location') {
+            metrics = await this.metricsRepository.getLocationMetrics();
         }
+
 
         return metrics
     }

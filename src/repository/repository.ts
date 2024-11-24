@@ -7,8 +7,9 @@ import {
   LoginMetric,
   LoginWithProviderMetric,
   BlockedMetric,
-  TwitMetric, RegisterWithProviderMetric, DateRange
+  TwitMetric, RegisterWithProviderMetric, DateRange, LocationMetric
 } from '../types/metric';
+import { ValidationError } from '../types/customErrors';
 
 export class MetricsRepository {
   private pool: Pool;
@@ -153,38 +154,34 @@ export class MetricsRepository {
     switch (dateRange) {
       case 'week':
         dateCondition = `
-        created_at >= date_trunc('week', ${referenceDate}::timestamp)
-        AND created_at < date_trunc('week', ${referenceDate}::timestamp) + interval '1 week'
+        created_at >= ${referenceDate}::timestamp - interval '7 days'
+        AND created_at <= ${referenceDate}::timestamp + interval '1 day'
       `;
-        groupByGranularity = "date_trunc('day', created_at)"; // Por día en la semana
+        groupByGranularity = "date_trunc('day', created_at)";
         break;
       case 'month':
         dateCondition = `
         created_at >= date_trunc('month', ${referenceDate}::timestamp)
         AND created_at < date_trunc('month', ${referenceDate}::timestamp) + interval '1 month'
       `;
-        //groupByGranularity = "date_trunc('week', created_at)"; // Agrupado por semanas en el mes
-        groupByGranularity = "date_trunc('day', created_at)"; // Por día en la semana
+        groupByGranularity = "date_trunc('day', created_at)";
         break;
       case 'year':
         dateCondition = `
         created_at >= date_trunc('year', ${referenceDate}::timestamp)
         AND created_at < date_trunc('year', ${referenceDate}::timestamp) + interval '1 year'
       `;
-        groupByGranularity = "date_trunc('month', created_at)"; // Agrupado por meses en el año
-        //groupByGranularity = "date_trunc('day', created_at)"; // Por día en la semana
+        //groupByGranularity = "date_trunc('month', created_at)"; // Agrupado por meses en el año
+        groupByGranularity = "date_trunc('day', created_at)"; // Por día en la semana
         break;
       default:
-        throw new Error('Invalid dateRange');
+        throw new ValidationError('dateRange', 'Invalid date range', 'INVALID_DATE_RANGE');
     }
-
-
-    console.log('dateCondition', dateCondition);
-    console.log('groupByGranularity', groupByGranularity);
 
     const query = `
       SELECT 
-          ${groupByGranularity} AS "date", -- Fecha truncada según la granularidad
+          ${groupByGranularity} AS "date",
+          TO_CHAR(${groupByGranularity}, 'FMDay') AS "dateName",  -- Nombre del día (e.g., 'Monday')
           COUNT(*)::int AS "amount" -- Total de métricas por el rango agrupado
       FROM 
           metrics
@@ -193,7 +190,7 @@ export class MetricsRepository {
           AND username = $2
           AND ${dateCondition} -- Filtrar según el rango de fechas
       GROUP BY 
-          ${groupByGranularity} -- Agrupación según la granularidad definida
+          ${groupByGranularity} --, TO_CHAR( ${groupByGranularity}, 'FMDay') -- Agrupación según la granularidad definida
       ORDER BY 
           ${groupByGranularity}; -- Ordenar los resultados por la fecha agrupada
   `;
@@ -233,5 +230,23 @@ export class MetricsRepository {
   baseDate?: Date
   ): Promise<TwitMetric[]> {
     return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
+  }
+
+  async getLocationMetrics(): Promise<LocationMetric[]> {
+    const query = `
+        SELECT 
+            created_at AS "date",
+            (metrics->>'country')::text AS "country"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'location'
+        ORDER BY 
+            created_at;
+    `;
+
+    const result: QueryResult<LocationMetric> = await this.pool.query(query);
+
+    return result.rows;
   }
 }
