@@ -454,7 +454,7 @@ describe('Metrics API Tests', () => {
       expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.latitude).toBe(-22.9068);
       expect(response.body.data.metrics.longitude).toBe(-43.1729);
-      expect(response.body.data.metrics.country).toBe('Brasil');
+      expect(response.body.data.metrics.country).toBe('Brazil');
     });
 
     it('should return 400 for invalid metrics with comment', async () => {
@@ -988,7 +988,7 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          //Brasil
+          //Brazil
           latitude: -22.9068,
           longitude: -43.1729
         }
@@ -1014,7 +1014,7 @@ describe('Metrics API Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body.data[0].country).toBe('Argentina');
       expect(response.body.data[0].amount).toBe(1);
-      expect(response.body.data[1].country).toBe('Brasil');
+      expect(response.body.data[1].country).toBe('Brazil');
       expect(response.body.data[1].amount).toBe(2);
 
       expect(response.body.data.length).toBe(2);
