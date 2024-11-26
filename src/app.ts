@@ -4,6 +4,7 @@ import path from 'path';
 import {DatabasePool} from "./repository/db";
 import metricRoutes from './routes/routes';
 import { errorHandler } from './middleware/errorHandler';
+import {logMiddleware} from './middleware/logMiddleware';
 
 function initializeEnvironment() {
     // Determine environment
@@ -62,6 +63,7 @@ async function startServer() {
     // Middleware
     app.use(cors());
     app.use(express.json());
+    app.use(logMiddleware);
 
     // Routes
     app.use('/metrics', metricRoutes);

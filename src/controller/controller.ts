@@ -36,7 +36,7 @@ export class MetricController {
       this.validateTwitMetrics(params);
       this.validateParamsType(params);
       const metrics = await this.metricService.getMetrics(params);
-      console.log('GET metrics', metrics);
+      console.log('Successfully GET metrics', metrics);
       res.status(200).json({ data: metrics });
     } catch (error) {
       next(error);
