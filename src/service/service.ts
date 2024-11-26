@@ -10,7 +10,7 @@ import {
   BlockedMetric,
   TwitMetric,
   LocationMetric,
-  FollowMetric, TotalFollowMetric
+  TotalFollowMetric
 } from '../types/metric';
 import axios from 'axios';
 import { ServiceUnavailableError } from '../types/customErrors';
@@ -24,24 +24,31 @@ export class MetricService {
 
   async createMetrics(metricsData: MetricDataDto): Promise<Metric> {
     if (metricsData.type == 'location') {
-      try {
-        const country = await axios.get(
-          `${process.env.NOMINATIM_URL ?? 'https://nominatim.openstreetmap.org/reverse'}`,
-          {
-            params: {
-              lat: metricsData.metrics.latitude,
-              lon: metricsData.metrics.longitude,
-              format: 'json'
-            }
-          }
-        );
-        metricsData.metrics.country = country.data.address.country;
-      } catch (error) {
-        console.error(error);
-        throw new ServiceUnavailableError();
-      }
+      await this.fetchLocation(metricsData);
     }
     return await this.metricsRepository.createMetric(metricsData);
+  }
+
+
+  private async fetchLocation(metricsData: MetricDataDto) {
+    try {
+      const response = await axios.get(`${process.env.API_LOCATION_URL}`, {
+        params: {
+          q: `${metricsData.metrics.latitude},${metricsData.metrics.longitude}`,
+          key: `${process.env.API_LOCATION_KEY}`
+        }
+      });
+
+      const results = response.data.results;
+      if (results.length > 0) {
+        metricsData.metrics.country = results[0].components.country;
+      } else {
+        metricsData.metrics.country = 'Unknown';
+      }
+    } catch (error) {
+      console.error(error);
+      throw new ServiceUnavailableError();
+    }
   }
 
   async getMetrics(
