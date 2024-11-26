@@ -266,7 +266,8 @@ export class MetricsRepository {
         groupByGranularity = "date_trunc('day', created_at)";
         break;
       default:
-        throw new ValidationError('dateRange', 'Invalid date range', 'INVALID_DATE_RANGE');
+        dateCondition = 'TRUE';
+        groupByGranularity = "date_trunc('day', created_at)";
     }
 
     return { dateCondition, groupByGranularity };

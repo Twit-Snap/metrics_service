@@ -65,7 +65,7 @@ export interface TotalFollowMetric {
   follows: FollowMetric[];
   total: number;
 }
-export type DateRange = 'week' | 'month' | 'year';
+export type DateRange = 'week' | 'month' | 'year' | 'all';
 
 export type ParamType =
   | 'register'

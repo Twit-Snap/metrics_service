@@ -831,5 +831,26 @@ describe('Metrics Repository', () => {
       expect(metrics.follows[0].amount).toBe(1);
 
     });
+
+    it('should fetch all twits if all is pass by parameter in dateRange', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'all');
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(1);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[0].amount).toBe(3);
+    });
   });
 });
