@@ -1,5 +1,5 @@
 import { Pool, QueryResult, QueryResultRow } from 'pg';
-import {DatabasePool} from "./db";
+import { DatabasePool } from './db';
 import {
   MetricDataDto,
   Metric,
@@ -7,7 +7,12 @@ import {
   LoginMetric,
   LoginWithProviderMetric,
   BlockedMetric,
-  TwitMetric, RegisterWithProviderMetric, DateRange, LocationMetric
+  TwitMetric,
+  RegisterWithProviderMetric,
+  DateRange,
+  LocationMetric,
+  FollowMetric,
+  TotalFollowMetric
 } from '../types/metric';
 import { ValidationError } from '../types/customErrors';
 
@@ -17,6 +22,7 @@ export class MetricsRepository {
   constructor(pool?: Pool) {
     this.pool = pool || DatabasePool.getInstance();
   }
+
   async createMetric(metricsData: MetricDataDto): Promise<Metric> {
     const { createdAt, type, username, metrics } = metricsData;
     const query = `
@@ -145,38 +151,7 @@ export class MetricsRepository {
     metricType: string,
     baseDate?: Date
   ): Promise<T[]> {
-
-    let dateCondition: string;
-    let groupByGranularity: string;
-
-    const referenceDate = baseDate ? `'${baseDate.toISOString().split('T')[0]}'` : 'CURRENT_DATE';
-
-    switch (dateRange) {
-      case 'week':
-        dateCondition = `
-        created_at >= ${referenceDate}::timestamp - interval '7 days'
-        AND created_at <= ${referenceDate}::timestamp + interval '1 day'
-      `;
-        groupByGranularity = "date_trunc('day', created_at)";
-        break;
-      case 'month':
-        dateCondition = `
-        created_at >= date_trunc('month', ${referenceDate}::timestamp)
-        AND created_at < date_trunc('month', ${referenceDate}::timestamp) + interval '1 month'
-      `;
-        groupByGranularity = "date_trunc('day', created_at)";
-        break;
-      case 'year':
-        dateCondition = `
-        created_at >= date_trunc('year', ${referenceDate}::timestamp)
-        AND created_at < date_trunc('year', ${referenceDate}::timestamp) + interval '1 year'
-      `;
-        //groupByGranularity = "date_trunc('month', created_at)"; // Agrupado por meses en el año
-        groupByGranularity = "date_trunc('day', created_at)"; // Por día en la semana
-        break;
-      default:
-        throw new ValidationError('dateRange', 'Invalid date range', 'INVALID_DATE_RANGE');
-    }
+    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
 
     const query = `
       SELECT 
@@ -198,7 +173,6 @@ export class MetricsRepository {
     const result: QueryResult<T> = await this.pool.query(query, [metricType, username]);
     return result.rows;
   }
-
 
   async getTwitMetricsByUsername(
     username: string | undefined,
@@ -227,9 +201,104 @@ export class MetricsRepository {
   async getCommentMetricsByUsername(
     username: string | undefined,
     dateRange: DateRange | undefined,
-  baseDate?: Date
+    baseDate?: Date
   ): Promise<TwitMetric[]> {
     return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
+  }
+
+  private async getTotalFollowersMetrics(): Promise<number> {
+    const query = `
+    SELECT 
+      SUM(
+        CASE 
+          WHEN (metrics->>'followed') = 'true' THEN 1 
+          WHEN (metrics->>'followed') = 'false' THEN -1 
+          ELSE 0 
+        END
+      )::int AS "totalFollowers"
+    FROM 
+      metrics
+    WHERE 
+      metric_type = 'follow';
+  `;
+
+    const result: QueryResult<{ totalFollowers: number }> = await this.pool.query(query);
+
+    return result.rows[0]?.totalFollowers || 0;
+  }
+
+  async getFollowersMetrics(
+    username: string | undefined,
+    dateRange: DateRange | undefined,
+    baseDate?: Date
+  ): Promise<TotalFollowMetric> {
+    const followsInTime = await this.getFollowMetricByUsername(username, dateRange, baseDate);
+    const totalFollowers = await this.getTotalFollowersMetrics();
+
+    return { follows: followsInTime, total: totalFollowers };
+  }
+  private selectGranurality(dateRange: DateRange | undefined , baseDate: Date | undefined): { dateCondition: string; groupByGranularity: string } {
+    const referenceDate = baseDate ? `'${baseDate.toISOString().split('T')[0]}'` : 'CURRENT_DATE';
+
+    let dateCondition: string;
+    let groupByGranularity: string;
+
+    switch (dateRange) {
+      case 'week':
+        dateCondition = `
+        created_at >= ${referenceDate}::timestamp - interval '7 days'
+        AND created_at <= ${referenceDate}::timestamp + interval '1 day'
+      `;
+        groupByGranularity = "date_trunc('day', created_at)";
+        break;
+      case 'month':
+        dateCondition = `
+        created_at >= date_trunc('month', ${referenceDate}::timestamp)
+        AND created_at < date_trunc('month', ${referenceDate}::timestamp) + interval '1 month'
+      `;
+        groupByGranularity = "date_trunc('day', created_at)";
+        break;
+      case 'year':
+        dateCondition = `
+        created_at >= date_trunc('year', ${referenceDate}::timestamp)
+        AND created_at < date_trunc('year', ${referenceDate}::timestamp) + interval '1 year'
+      `;
+        groupByGranularity = "date_trunc('day', created_at)";
+        break;
+      default:
+        throw new ValidationError('dateRange', 'Invalid date range', 'INVALID_DATE_RANGE');
+    }
+
+    return { dateCondition, groupByGranularity };
+  }
+
+  private async getFollowMetricByUsername(
+    username: string | undefined,
+    dateRange: DateRange | undefined,
+    baseDate?: Date
+  ): Promise<FollowMetric[]> {
+
+    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
+    const query = `
+      SELECT 
+          ${groupByGranularity} AS "date",
+          TO_CHAR(${groupByGranularity}, 'FMDay') AS "dateName",  -- Nombre del día (e.g., 'Monday')
+          SUM(CASE WHEN (metrics->>'followed')::boolean THEN 1 ELSE 0 END)::int AS "amount"
+          
+      FROM 
+          metrics
+      WHERE 
+          metric_type = 'follow' 
+          AND username = $1
+          AND ${dateCondition} 
+      GROUP BY 
+          ${groupByGranularity} --, TO_CHAR( ${groupByGranularity}, 'FMDay') 
+      ORDER BY 
+          ${groupByGranularity}; 
+  `;
+
+    const result: QueryResult<FollowMetric> = await this.pool.query(query, [username]);
+    return result.rows;
   }
 
   async getLocationMetrics(): Promise<LocationMetric[]> {

@@ -442,7 +442,7 @@ describe('Metrics API Tests', () => {
         username: 'testuser',
         metrics: {
           latitude: -22.9068,
-          longitude: -43.1729,
+          longitude: -43.1729
         }
       };
 
@@ -578,6 +578,132 @@ describe('Metrics API Tests', () => {
       expect(response.status).toBe(400);
       expect(response.body.type).toBe('INVALID_COORDINATES');
       expect(response.body.detail).toBe('Invalid coordinates');
+    });
+
+    it('should raise 400 if the amount of follow metric is not defined', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          followed: true
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('"amount" is required');
+    });
+
+    it('should raise 400 if the amount of follow metric is not a number', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: 'invalid',
+          followed: true
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_AMOUNT');
+      expect(response.body.detail).toBe('"amount" must be a number');
+    });
+
+    it('should raise 400 if the amount of follow metric is negative', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: -1,
+          followed: true
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_AMOUNT');
+      expect(response.body.detail).toBe('"amount" must be a positive number');
+    });
+
+    it('should raise 400 if the followed field is not defined in follow metric', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: 1,
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('"followed" is required');
+    });
+
+    it('should raise 400 if the followed field is not a boolean in follow metric', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: 1,
+          followed: 'invalid'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_FOLLOWED');
+      expect(response.body.detail).toBe('"followed" must be a boolean');
+    });
+
+
+
+    it('should raise 400 if the type is invalid', async () => {
+      const metricData = {
+        type: 'invalid',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: 1
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_TYPE');
+      expect(response.body.detail).toBe('Invalid type');
+    });
+
+    it('should creta a follow metric', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          amount: 1,
+          followed: true
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('follow');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+      expect(response.body.data.metrics.amount).toBe(1);
     });
 
   });
@@ -857,7 +983,6 @@ describe('Metrics API Tests', () => {
     });
 
     it('should get location metrics group by country', async () => {
-
       const metricData = {
         type: 'location',
         createdAt: new Date().toISOString(),
@@ -865,9 +990,9 @@ describe('Metrics API Tests', () => {
         metrics: {
           //Brasil
           latitude: -22.9068,
-          longitude: -43.1729,
+          longitude: -43.1729
         }
-      }
+      };
 
       const anotherMetricData = {
         type: 'location',
@@ -876,13 +1001,13 @@ describe('Metrics API Tests', () => {
         //Argentina
         metrics: {
           latitude: -34.61315,
-          longitude: -58.37723,
+          longitude: -58.37723
         }
-      }
+      };
 
-      const a = await request(app).post('/metrics').send(metricData);
-      const b = await request(app).post('/metrics').send(metricData);
-      const c = await request(app).post('/metrics').send(anotherMetricData);
+      await request(app).post('/metrics').send(metricData);
+      await request(app).post('/metrics').send(metricData);
+      await request(app).post('/metrics').send(anotherMetricData);
 
       const response = await request(app).get('/metrics').query({ type: 'location' });
 
@@ -894,5 +1019,31 @@ describe('Metrics API Tests', () => {
 
       expect(response.body.data.length).toBe(2);
     });
+
+    it('should get follow metrics', async () => {
+      const metricData = {
+        type: 'follow',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          followed: true,
+          amount: 1
+        }
+      };
+
+      await request(app).post('/metrics').send(metricData);
+
+      const followMetric = await request(app)
+        .get('/metrics')
+        .query({ type: 'follow', username: metricData.username });
+
+      console.log('data', followMetric.body.data);
+      expect(followMetric.status).toBe(200);
+      expect(followMetric.body.data.follows[0].amount).toBe(1);
+      expect(followMetric.body.data.total).toBe(1);
+      expect(followMetric.body.data.follows.length).toBe(1);
+    });
+
+
   });
 });
