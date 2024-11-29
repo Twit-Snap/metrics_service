@@ -1044,6 +1044,25 @@ describe('Metrics API Tests', () => {
       expect(followMetric.body.data.follows.length).toBe(1);
     });
 
+    it('should get auth twit metrics by username', async () => {
+      const metricData = {
+        type: 'auth_twit',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const post = await request(app).post('/metrics').send(metricData);
+      console.log(post.body.data)
+
+      const response = await request(app).get('/metrics').query({ type: 'auth_twit', username: 'testuser' });
+      expect(response.status).toBe(200);
+      expect(response.body.data.total).toBe(1);
+      expect(response.body.data.twits[0].amount).toBe(1);
+
+      expect(response.body.data.twits.length).toBe(1);
+    });
+
 
   });
 });

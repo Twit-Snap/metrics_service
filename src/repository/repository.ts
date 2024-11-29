@@ -12,7 +12,8 @@ import {
   DateRange,
   LocationMetric,
   FollowMetric,
-  TotalFollowMetric
+  TotalFollowMetric,
+  AuthTwitMetric
 } from '../types/metric';
 import { ValidationError } from '../types/customErrors';
 
@@ -151,7 +152,7 @@ export class MetricsRepository {
     metricType: string,
     baseDate?: Date
   ): Promise<T[]> {
-    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
 
     const query = `
       SELECT 
@@ -237,7 +238,14 @@ export class MetricsRepository {
 
     return { follows: followsInTime, total: totalFollowers };
   }
-  private selectGranurality(dateRange: DateRange | undefined , baseDate: Date | undefined): { dateCondition: string; groupByGranularity: string } {
+
+  private selectGranurality(
+    dateRange: DateRange | undefined,
+    baseDate: Date | undefined
+  ): {
+    dateCondition: string;
+    groupByGranularity: string;
+  } {
     const referenceDate = baseDate ? `'${baseDate.toISOString().split('T')[0]}'` : 'CURRENT_DATE';
 
     let dateCondition: string;
@@ -278,8 +286,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<FollowMetric[]> {
-
-    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
     const query = `
       SELECT 
           ${groupByGranularity} AS "date",
@@ -300,6 +307,16 @@ export class MetricsRepository {
 
     const result: QueryResult<FollowMetric> = await this.pool.query(query, [username]);
     return result.rows;
+  }
+
+  async getTwitsAuthMetricsByUsername(
+    username: string | undefined,
+    baseDate?: Date
+  ): Promise<AuthTwitMetric> {
+    const twits = await this.getMetricsByUsername<TwitMetric>(username, 'all', 'auth_twit', baseDate);
+    const total = twits.reduce((acc, curr) => acc + curr.amount, 0);
+
+    return { twits: twits, total: total };
   }
 
   async getLocationMetrics(): Promise<LocationMetric[]> {

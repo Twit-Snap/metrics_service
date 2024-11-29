@@ -14,7 +14,8 @@ export class MetricController {
   async createMetrics(req: Request, res: Response, next: NextFunction) {
     try {
       const metricsData: MetricDataDto = req.body;
-      this.validateParameters(metricsData);
+      this.
+      validateParameters(metricsData);
       const metric = await this.metricService.createMetrics(metricsData);
       console.log('Successfully created metric', metric);
       res.status(201).json({ data: metric });
@@ -69,7 +70,8 @@ export class MetricController {
       metricsData.type === 'twit' ||
       metricsData.type === 'like' ||
       metricsData.type === 'retwit' ||
-      metricsData.type === 'comment'
+      metricsData.type === 'comment' ||
+      metricsData.type === 'auth_twit'
     ) {
       this.validateEmptyBodyMetric(metricsData.metrics);
     } else if (metricsData.type === 'login_with_provider') {
@@ -162,7 +164,8 @@ export class MetricController {
       params.type === 'twit' ||
       params.type === 'like' ||
       params.type === 'retwit' ||
-      params.type === 'comment'
+      params.type === 'comment' ||
+      params.type === 'auth_twit'
     ) {
       if (!params.username) {
         throw new ValidationError('username', 'Username is required', 'MISSING_FIELD');

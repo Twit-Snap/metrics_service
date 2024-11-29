@@ -65,6 +65,11 @@ export interface TotalFollowMetric {
   follows: FollowMetric[];
   total: number;
 }
+
+export interface  AuthTwitMetric {
+  total: number;
+  twits: TwitMetric[];
+}
 export type DateRange = 'week' | 'month' | 'year' | 'all';
 
 export type ParamType =
@@ -78,7 +83,8 @@ export type ParamType =
   | 'retwit'
   | 'comment'
   | 'location'
-  | 'follow';
+  | 'follow'
+  | 'auth_twit';
 
 export const PARAM_TYPES: ParamType[] = [
   'register',
@@ -92,6 +98,7 @@ export const PARAM_TYPES: ParamType[] = [
   'comment',
   'location',
   'follow',
+  'auth_twit'
 ];
 
 export type Params = {

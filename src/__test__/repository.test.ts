@@ -447,12 +447,12 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(aMetricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-      const actuaDate = new Date('2024-11-21');
+      const actualDate = new Date('2024-11-21');
 
       const metrics = await metricsRepository.getTwitMetricsByUsername(
         'testuser',
         'week',
-        actuaDate
+        actualDate
       );
       console.log('metrics: ', metrics);
       expect(metrics).toBeDefined();
@@ -852,5 +852,24 @@ describe('Metrics Repository', () => {
       );
       expect(metrics[0].amount).toBe(3);
     });
+
+    it('should get auth twits metrics by username ', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'auth_twit',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getTwitsAuthMetricsByUsername('testuser');
+      expect(metrics).toBeDefined();
+      expect(metrics.total).toBe(3);
+      expect(metrics.twits.length).toBe(1);
+      expect(metrics.twits[0].amount).toBe(3);
+    })
   });
 });
