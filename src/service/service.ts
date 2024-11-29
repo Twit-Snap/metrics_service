@@ -87,10 +87,14 @@ export class MetricService {
     } else if (params.type == 'blocked') {
       metrics = await this.metricsRepository.getBlockedMetrics();
     } else if (params.type == 'twit') {
-      metrics = await this.metricsRepository.getTwitMetricsByUsername(
-        params.username,
-        params.dateRange
-      );
+      if(params.auth) {
+        metrics = await this.metricsRepository.getTwitsAuthMetricsByUsername(params.username);
+      }else {
+        metrics = await this.metricsRepository.getTwitMetricsByUsername(
+          params.username,
+          params.dateRange
+        );
+      }
     } else if (params.type == 'like') {
       metrics = await this.metricsRepository.getLikeMetricsByUsername(
         params.username,
@@ -113,8 +117,6 @@ export class MetricService {
         params.username,
         params.dateRange
       );
-    } else if (params.type == 'auth_twit') {
-      metrics = await this.metricsRepository.getTwitsAuthMetricsByUsername(params.username);
     }
     return metrics;
   }

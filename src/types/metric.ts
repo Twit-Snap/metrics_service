@@ -105,4 +105,5 @@ export type Params = {
   type: string;
   username?: string;
   dateRange?: DateRange;
+  auth?: boolean;
 };

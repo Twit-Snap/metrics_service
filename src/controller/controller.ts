@@ -32,7 +32,8 @@ export class MetricController {
         username: req.query.username ? req.query.username.toString() : '',
         dateRange: validDateRanges.includes(req.query.dateRange?.toString() as DateRange)
           ? (req.query.dateRange?.toString() as DateRange)
-          : 'week'
+          : 'week',
+        auth: req.query.auth === 'true'
       };
       this.validateTwitMetrics(params);
       this.validateParamsType(params);
@@ -70,8 +71,7 @@ export class MetricController {
       metricsData.type === 'twit' ||
       metricsData.type === 'like' ||
       metricsData.type === 'retwit' ||
-      metricsData.type === 'comment' ||
-      metricsData.type === 'auth_twit'
+      metricsData.type === 'comment'
     ) {
       this.validateEmptyBodyMetric(metricsData.metrics);
     } else if (metricsData.type === 'login_with_provider') {
@@ -164,8 +164,7 @@ export class MetricController {
       params.type === 'twit' ||
       params.type === 'like' ||
       params.type === 'retwit' ||
-      params.type === 'comment' ||
-      params.type === 'auth_twit'
+      params.type === 'comment'
     ) {
       if (!params.username) {
         throw new ValidationError('username', 'Username is required', 'MISSING_FIELD');

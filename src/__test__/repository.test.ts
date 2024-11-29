@@ -856,7 +856,7 @@ describe('Metrics Repository', () => {
     it('should get auth twits metrics by username ', async () => {
       const metricsRepository = new MetricsRepository(pool);
       const metricData: MetricDataDto = {
-        type: 'auth_twit',
+        type: 'twit',
         createdAt: new Date(),
         username: 'testuser',
         metrics: {}

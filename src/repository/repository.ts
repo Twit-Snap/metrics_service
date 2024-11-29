@@ -313,7 +313,7 @@ export class MetricsRepository {
     username: string | undefined,
     baseDate?: Date
   ): Promise<AuthTwitMetric> {
-    const twits = await this.getMetricsByUsername<TwitMetric>(username, 'all', 'auth_twit', baseDate);
+    const twits = await this.getMetricsByUsername<TwitMetric>(username, 'all', 'twit', baseDate);
     const total = twits.reduce((acc, curr) => acc + curr.amount, 0);
 
     return { twits: twits, total: total };
@@ -338,4 +338,9 @@ export class MetricsRepository {
 
     return result.rows;
   }
+
+  /*
+  async getHashtagMetrics(baseDate?: Date): Promise<TwitMetric[]> {
+*/
+
 }

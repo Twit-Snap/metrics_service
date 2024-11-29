@@ -1046,7 +1046,7 @@ describe('Metrics API Tests', () => {
 
     it('should get auth twit metrics by username', async () => {
       const metricData = {
-        type: 'auth_twit',
+        type: 'twit',
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {}
@@ -1055,7 +1055,7 @@ describe('Metrics API Tests', () => {
       const post = await request(app).post('/metrics').send(metricData);
       console.log(post.body.data)
 
-      const response = await request(app).get('/metrics').query({ type: 'auth_twit', username: 'testuser' });
+      const response = await request(app).get('/metrics').query({ type: 'twit', username: 'testuser', auth: 'true' });
       expect(response.status).toBe(200);
       expect(response.body.data.total).toBe(1);
       expect(response.body.data.twits[0].amount).toBe(1);
