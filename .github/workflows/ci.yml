@@ -1,0 +1,50 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: 
+      - master
+  pull_request:
+    branches: '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run integration tests
+        run: npm run ci-test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          CI: true
+          API_LOCATION_URL: https://api.opencagedata.com/geocode/v1/json
+          API_LOCATION_KEY: ${{ secrets.API_LOCATION_KEY }}
