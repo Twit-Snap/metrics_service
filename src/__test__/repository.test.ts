@@ -853,7 +853,7 @@ describe('Metrics Repository', () => {
       expect(metrics[0].amount).toBe(3);
     });
 
-    it('should get auth twits metrics by username ', async () => {
+    it('should get auth twits metrics', async () => {
       const metricsRepository = new MetricsRepository(pool);
       const metricData: MetricDataDto = {
         type: 'twit',
@@ -865,7 +865,7 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(metricData);
-      const metrics = await metricsRepository.getTwitsAuthMetricsByUsername('testuser');
+      const metrics = await metricsRepository.getTwitsAuthMetrics();
       expect(metrics).toBeDefined();
       expect(metrics.total).toBe(3);
       expect(metrics.twits.length).toBe(1);

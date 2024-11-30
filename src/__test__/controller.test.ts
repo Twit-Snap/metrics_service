@@ -1044,7 +1044,7 @@ describe('Metrics API Tests', () => {
       expect(followMetric.body.data.follows.length).toBe(1);
     });
 
-    it('should get auth twit metrics by username', async () => {
+    it('should get auth twit metrics with many users', async () => {
       const metricData = {
         type: 'twit',
         createdAt: new Date().toISOString(),
@@ -1055,14 +1055,31 @@ describe('Metrics API Tests', () => {
       const post = await request(app).post('/metrics').send(metricData);
       console.log(post.body.data)
 
-      const response = await request(app).get('/metrics').query({ type: 'twit', username: 'testuser', auth: 'true' });
+      const response = await request(app).get('/metrics').query({ type: 'twit', auth: 'true' });
       expect(response.status).toBe(200);
-      expect(response.body.data.total).toBe(1);
-      expect(response.body.data.twits[0].amount).toBe(1);
+      expect(response.body.data.total).toBe(2);
+      expect(response.body.data.twits[0].amount).toBe(2);
 
       expect(response.body.data.twits.length).toBe(1);
     });
 
+    it('should get auth twit metrics with many users in different dates', async () => {
+      const metricData = {
+        type: 'twit',
+        createdAt: new Date("2024-11-29").toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
 
+      const post = await request(app).post('/metrics').send(metricData);
+      console.log(post.body.data)
+
+      const response = await request(app).get('/metrics').query({ type: 'twit', auth: 'true' });
+      expect(response.status).toBe(200);
+      expect(response.body.data.total).toBe(2);
+      expect(response.body.data.twits[0].amount).toBe(1);
+
+      expect(response.body.data.twits.length).toBe(2);
+    });
   });
 });

@@ -161,7 +161,7 @@ export class MetricController {
 
   private validateTwitMetrics(params: Params) {
     if (
-      params.type === 'twit' ||
+      (params.type === 'twit' && !params.auth) ||
       params.type === 'like' ||
       params.type === 'retwit' ||
       params.type === 'comment'

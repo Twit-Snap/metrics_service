@@ -175,6 +175,32 @@ export class MetricsRepository {
     return result.rows;
   }
 
+  private async getTwitMetrics(
+    dateRange: DateRange | undefined,
+    baseDate?: Date
+  ): Promise<TwitMetric[]> {
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
+
+    const query = `
+      SELECT 
+          ${groupByGranularity} AS "date",
+          TO_CHAR(${groupByGranularity}, 'FMDay') AS "dateName",
+          COUNT(*)::int AS "amount"
+      FROM 
+          metrics
+      WHERE 
+          metric_type = $1 
+          AND ${dateCondition} -- Filtrar según el rango de fechas
+      GROUP BY 
+          ${groupByGranularity} --, TO_CHAR( ${groupByGranularity}, 'FMDay') -- Agrupación según la granularidad definida
+      ORDER BY 
+          ${groupByGranularity}; -- Ordenar los resultados por la fecha agrupada
+  `;
+
+    const result: QueryResult<TwitMetric> = await this.pool.query(query, ['twit']);
+    return result.rows;
+  }
+
   async getTwitMetricsByUsername(
     username: string | undefined,
     dateRange: DateRange | undefined,
@@ -309,11 +335,11 @@ export class MetricsRepository {
     return result.rows;
   }
 
-  async getTwitsAuthMetricsByUsername(
-    username: string | undefined,
+
+  async getTwitsAuthMetrics(
     baseDate?: Date
   ): Promise<AuthTwitMetric> {
-    const twits = await this.getMetricsByUsername<TwitMetric>(username, 'all', 'twit', baseDate);
+    const twits = await this.getTwitMetrics('all', baseDate);
     const total = twits.reduce((acc, curr) => acc + curr.amount, 0);
 
     return { twits: twits, total: total };

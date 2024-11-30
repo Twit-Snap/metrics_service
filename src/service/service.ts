@@ -88,7 +88,7 @@ export class MetricService {
       metrics = await this.metricsRepository.getBlockedMetrics();
     } else if (params.type == 'twit') {
       if(params.auth) {
-        metrics = await this.metricsRepository.getTwitsAuthMetricsByUsername(params.username);
+        metrics = await this.metricsRepository.getTwitsAuthMetrics();
       }else {
         metrics = await this.metricsRepository.getTwitMetricsByUsername(
           params.username,
