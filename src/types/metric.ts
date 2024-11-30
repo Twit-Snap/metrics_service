@@ -70,6 +70,12 @@ export interface  AuthTwitMetric {
   total: number;
   twits: TwitMetric[];
 }
+
+export interface HashtagMetric {
+  hashtag: string;
+  amount: number;
+  date: Date;
+}
 export type DateRange = 'week' | 'month' | 'year' | 'all';
 
 export type ParamType =

@@ -871,5 +871,73 @@ describe('Metrics Repository', () => {
       expect(metrics.twits.length).toBe(1);
       expect(metrics.twits[0].amount).toBe(3);
     })
+
+    it('should get hashtag metrics', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {hashtag: 'test'}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getHashtagMetrics();
+      expect(metrics).toBeDefined();
+      expect(metrics[0].amount).toBe(1);
+      expect(metrics[0].hashtag).toBe('test');
+      expect(metrics.length).toBe(1);
+    });
+
+    it('should get hashtag metrics by date and by hashtag type', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date("2024-11-29"),
+        username: 'testuser',
+        metrics: {hashtag: 'test'}
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date("2024-11-29"),
+        username: 'testuser',
+        metrics: {hashtag: 'test2'}
+      };
+
+      const thirdMetricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {hashtag: 'test2'}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+      await metricsRepository.createMetric(thirdMetricData);
+
+
+      const metrics = await metricsRepository.getHashtagMetrics();
+      expect(metrics).toBeDefined();
+      expect(metrics[0].amount).toBe(2);
+      expect(metrics[0].hashtag).toBe('test');
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[1].hashtag).toBe('test2');
+      expect(metrics[1].amount).toBe(1);
+      expect(metrics[1].date.toISOString().split('T')[0]).toBe(
+        anotherMetricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[2].hashtag).toBe('test2');
+      expect(metrics[2].amount).toBe(1);
+      expect(metrics[2].date.toISOString().split('T')[0]).toBe(
+        thirdMetricData.createdAt.toISOString().split('T')[0]
+      );
+
+      expect(metrics.length).toBe(3);
+    });
+
   });
 });

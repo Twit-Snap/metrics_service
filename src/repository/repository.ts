@@ -13,9 +13,8 @@ import {
   LocationMetric,
   FollowMetric,
   TotalFollowMetric,
-  AuthTwitMetric
+  AuthTwitMetric, HashtagMetric
 } from '../types/metric';
-import { ValidationError } from '../types/customErrors';
 
 export class MetricsRepository {
   private pool: Pool;
@@ -365,8 +364,25 @@ export class MetricsRepository {
     return result.rows;
   }
 
-  /*
-  async getHashtagMetrics(baseDate?: Date): Promise<TwitMetric[]> {
-*/
+  async getHashtagMetrics(): Promise<HashtagMetric[]> {
+    const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+            COUNT(*)::int AS "amount",
+            (metrics->>'hashtag')::text AS "hashtag"
+    
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'hashtag'
+        GROUP BY 
+            DATE(created_at), metrics->>'hashtag'
+        ORDER BY 
+            DATE(created_at), (metrics->>'hashtag') ;
+    `;
+
+    const result: QueryResult<HashtagMetric> = await this.pool.query(query);
+    return result.rows;
+  }
 
 }
