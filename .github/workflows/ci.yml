@@ -19,7 +19,7 @@ jobs:
           POSTGRES_PASSWORD: mypassword
           POSTGRES_DB: twitter_metrics
         ports:
-          - 5431:5431
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -61,7 +61,7 @@ jobs:
       - name: Run integration tests
         run: npm run ci-test
         env:
-          DATABASE_URL: postgresql://myuser:mypassword@localhost:5431/twitter_metrics
+          DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/twitter_metrics
           CI: true
           API_LOCATION_URL: https://api.opencagedata.com/geocode/v1/json
           API_LOCATION_KEY: ${{ secrets.API_LOCATION_KEY }}
