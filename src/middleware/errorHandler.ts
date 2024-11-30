@@ -2,6 +2,7 @@ import {Request, Response, NextFunction} from "express";
 import { ServiceUnavailableError, ValidationError } from '../types/customErrors';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof ValidationError) {
         console.warn(`ValidationError: ${err.message}`, {
