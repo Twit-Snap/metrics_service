@@ -15,11 +15,11 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: twitter_metrics
         ports:
-          - 5432:5432
+          - 5431:5431
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -42,7 +42,7 @@ jobs:
             sleep 1
           done
           # Run the initialization script
-          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f init.sql
+          PGPASSWORD=postgres psql -h localhost -U postgres -d twitter_metrics -f init.sql
         env:
           PGPASSWORD: postgres
 
@@ -61,7 +61,7 @@ jobs:
       - name: Run integration tests
         run: npm run ci-test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          DATABASE_URL: postgresql://myuser:mypassword@localhost:5431/twitter_metrics
           CI: true
           API_LOCATION_URL: https://api.opencagedata.com/geocode/v1/json
           API_LOCATION_KEY: ${{ secrets.API_LOCATION_KEY }}
