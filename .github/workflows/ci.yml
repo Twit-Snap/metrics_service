@@ -34,6 +34,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Copy init.sql to container
+        run: |
+          docker cp ${{ github.workspace }}/db/init.sql $(docker ps -q --filter ancestor=postgres:14):/docker-entrypoint-initdb.d/
+          docker exec $(docker ps -q --filter ancestor=postgres:14) psql -U postgres -d test_db -f /docker-entrypoint-initdb.d/init.sql
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
           node-version: '20'
           cache: 'npm'
 
