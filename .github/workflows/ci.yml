@@ -37,10 +37,16 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Copy init.sql to container
+      - name: Initialize PostgreSQL
         run: |
-          docker cp ${{ github.workspace }}/db/init.sql $(docker ps -q --filter ancestor=postgres:14):/docker-entrypoint-initdb.d/
-          docker exec $(docker ps -q --filter ancestor=postgres:14) psql -U postgres -d test_db -f /docker-entrypoint-initdb.d/init.sql
+          # Wait for PostgreSQL to be ready
+          until PGPASSWORD=postgres psql -h localhost -U postgres -c '\q'; do
+            sleep 1
+          done
+          # Run the initialization script
+          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f db/init.sql
+        env:
+          PGPASSWORD: postgres
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
