@@ -42,7 +42,7 @@ jobs:
             sleep 1
           done
           # Run the initialization script
-          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f db/init.sql
+          PGPASSWORD=postgres psql -h localhost -U postgres -d test_db -f init.sql
         env:
           PGPASSWORD: postgres
 
