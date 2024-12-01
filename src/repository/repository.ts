@@ -365,24 +365,59 @@ export class MetricsRepository {
   }
 
   async getHashtagMetrics(): Promise<HashtagMetric[]> {
-    const query = `
+    // Obtener todos los hashtags posibles
+    const hashtagQuery = `
+    SELECT DISTINCT (metrics->>'hashtag') AS hashtag
+    FROM metrics
+    WHERE metric_type = 'hashtag';
+  `;
+
+    // Obtener las métricas por fecha
+    const metricQuery = `
+    SELECT 
+        date,
+        jsonb_object_agg(hashtag, amount) AS hashtags
+    FROM (
         SELECT 
-            DATE(created_at) AS "date",
-            COUNT(*)::int AS "amount",
-            (metrics->>'hashtag')::text AS "hashtag"
-    
+            DATE(created_at) AS date,
+            (metrics->>'hashtag')::text AS hashtag,
+            COUNT(*)::int AS amount
         FROM 
             metrics
         WHERE 
             metric_type = 'hashtag'
         GROUP BY 
-            DATE(created_at), metrics->>'hashtag'
-        ORDER BY 
-            DATE(created_at), (metrics->>'hashtag') ;
-    `;
+            DATE(created_at), (metrics->>'hashtag')
+    ) subquery
+    GROUP BY date
+    ORDER BY date;
+  `;
 
-    const result: QueryResult<HashtagMetric> = await this.pool.query(query);
-    return result.rows;
+    // Ejecutar ambas consultas en paralelo
+    const [hashtagResult, metricResult]: [QueryResult<{ hashtag: string }>, QueryResult<HashtagMetric>] = await Promise.all([
+      this.pool.query(hashtagQuery),
+      this.pool.query(metricQuery)
+    ]);
+
+    // Extraer todos los hashtags posibles
+    const allHashtags = hashtagResult.rows.map(row => row.hashtag);
+
+    // Completar las métricas asegurando que cada fecha tenga todos los hashtags
+    const completeMetrics = metricResult.rows.map(metric => {
+      const row = { ...metric }; // Copia del objeto original de métricas
+      row.hashtags = { ...row.hashtags }; // Copia los hashtags existentes
+
+      // Agregar los hashtags que faltan con valor 0
+      allHashtags.forEach(hashtag => {
+        if (!row.hashtags[hashtag]) {
+          row.hashtags[hashtag] = 0;
+        }
+      });
+
+      return row;
+    });
+
+    return completeMetrics;
   }
 
 }

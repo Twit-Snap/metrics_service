@@ -72,9 +72,8 @@ export interface  AuthTwitMetric {
 }
 
 export interface HashtagMetric {
-  hashtag: string;
-  amount: number;
   date: Date;
+  hashtags: Record<string, number>;
 }
 export type DateRange = 'week' | 'month' | 'year' | 'all';
 
