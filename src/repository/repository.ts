@@ -151,7 +151,7 @@ export class MetricsRepository {
     metricType: string,
     baseDate?: Date
   ): Promise<T[]> {
-    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
 
     const query = `
       SELECT 
@@ -179,7 +179,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'twit', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'twit', baseDate);
   }
 
   async getLikeMetricsByUsername(
@@ -187,7 +187,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'like', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'like', baseDate);
   }
 
   async getRetwitMetricsByUsername(
@@ -195,7 +195,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'retwit', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'retwit', baseDate);
   }
 
   async getCommentMetricsByUsername(
@@ -203,7 +203,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
   }
 
   private async getTotalFollowersMetrics(): Promise<number> {
@@ -237,7 +237,10 @@ export class MetricsRepository {
 
     return { follows: followsInTime, total: totalFollowers };
   }
-  private selectGranurality(dateRange: DateRange | undefined , baseDate: Date | undefined): { dateCondition: string; groupByGranularity: string } {
+  private selectGranurality(
+    dateRange: DateRange | undefined,
+    baseDate: Date | undefined
+  ): { dateCondition: string; groupByGranularity: string } {
     const referenceDate = baseDate ? `'${baseDate.toISOString().split('T')[0]}'` : 'CURRENT_DATE';
 
     let dateCondition: string;
@@ -277,8 +280,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<FollowMetric[]> {
-
-    const {groupByGranularity,dateCondition}  = this.selectGranurality(dateRange, baseDate);
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
     const query = `
       SELECT 
           ${groupByGranularity} AS "date",
