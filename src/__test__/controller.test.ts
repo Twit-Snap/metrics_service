@@ -2,13 +2,14 @@
 
 import request from 'supertest';
 import { Pool } from 'pg';
-import app from '../app';
+import app, { initializeEnvironment } from '../app';
 import { DatabasePool } from '../repository/db';
 
 describe('Metrics API Tests', () => {
   let pool: Pool;
 
   beforeAll(async () => {
+    initializeEnvironment();
     pool = DatabasePool.getInstance();
     await pool.query('DELETE FROM metrics');
   });
@@ -639,7 +640,7 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          amount: 1,
+          amount: 1
         }
       };
 
@@ -667,8 +668,6 @@ describe('Metrics API Tests', () => {
       expect(response.body.type).toBe('INVALID_FOLLOWED');
       expect(response.body.detail).toBe('"followed" must be a boolean');
     });
-
-
 
     it('should raise 400 if the type is invalid', async () => {
       const metricData = {
@@ -705,7 +704,6 @@ describe('Metrics API Tests', () => {
       expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.amount).toBe(1);
     });
-
   });
 
   describe('GET /metrics', () => {
@@ -1043,7 +1041,5 @@ describe('Metrics API Tests', () => {
       expect(followMetric.body.data.total).toBe(1);
       expect(followMetric.body.data.follows.length).toBe(1);
     });
-
-
   });
 });

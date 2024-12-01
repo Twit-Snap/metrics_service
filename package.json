@@ -5,7 +5,7 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint .",
-    "test": "docker-compose up -d db && jest --maxWorkers=1 --coverage --forceExit",
+    "test": "docker-compose up -d db && NODE_ENV=development&& jest --maxWorkers=1 --coverage ",
     "ci-test": "jest --no-cache --maxWorkers=1 --coverage --ci"
   },
   "name": "metrics_service",

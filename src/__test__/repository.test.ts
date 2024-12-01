@@ -3,6 +3,7 @@ import { DatabasePool } from '../repository/db';
 import { MetricsRepository } from '../repository/repository';
 import { MetricDataDto } from '../types/metric';
 import dotenv from 'dotenv';
+import { initializeEnvironment } from '../app';
 
 dotenv.config({ path: '../../.env.dev' });
 
@@ -10,6 +11,7 @@ describe('Metrics Repository', () => {
   let pool: Pool;
 
   beforeAll(async () => {
+    initializeEnvironment();
     pool = DatabasePool.getInstance();
     await pool.query('DELETE FROM metrics');
   });
@@ -778,8 +780,6 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-
-
       const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
       expect(metrics).toBeDefined();
       expect(metrics.total).toBe(3);
@@ -821,7 +821,6 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-
       const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
       expect(metrics).toBeDefined();
       expect(metrics.total).toBe(0);
@@ -829,7 +828,6 @@ describe('Metrics Repository', () => {
         anotherMetricData.createdAt.toISOString().split('T')[0]
       );
       expect(metrics.follows[0].amount).toBe(1);
-
     });
   });
 });
