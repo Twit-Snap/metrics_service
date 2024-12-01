@@ -3,6 +3,7 @@ import { DatabasePool } from '../repository/db';
 import { MetricsRepository } from '../repository/repository';
 import { MetricDataDto } from '../types/metric';
 import dotenv from 'dotenv';
+import { ValidationError } from '../types/customErrors';
 
 dotenv.config({ path: '../../.env.dev' });
 
@@ -226,6 +227,26 @@ describe('Metrics Repository', () => {
         createdAt: new Date('2024-11-10'),
         username: 'testuser',
         metrics: {}
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
+    it('should create a new metric with hashtag', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          hashtag: 'test'
+        }
       };
 
       const metric = await metricsRepository.createMetric(metricData);
@@ -938,6 +959,5 @@ describe('Metrics Repository', () => {
 
       expect(metrics.length).toBe(3);
     });
-
   });
 });

@@ -82,6 +82,8 @@ export class MetricController {
       this.validateLocationMetrics(metricsData);
     }else if(metricsData.type === 'follow') {
       this.validateFollowMetric(metricsData.metrics);
+    }else if(metricsData.type === 'hashtag'){
+      this.validateHashtagMetric(metricsData.metrics);
     } else {
       throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
     }
@@ -195,6 +197,16 @@ export class MetricController {
       }
     } else {
       throw new ValidationError('metrics', '"amount" is required', 'MISSING_FIELD');
+    }
+  }
+
+  private validateHashtagMetric(metrics: Record<string, string | number | boolean | Date>) {
+    if ('hashtag' in metrics) {
+      if (typeof metrics.hashtag !== 'string') {
+        throw new ValidationError('metrics', '"hashtag" must be a string', 'INVALID_HASHTAG');
+      }
+    } else {
+      throw new ValidationError('metrics', '"hashtag" is required', 'MISSING_FIELD');
     }
   }
 }

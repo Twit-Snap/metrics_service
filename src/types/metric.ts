@@ -90,7 +90,8 @@ export type ParamType =
   | 'comment'
   | 'location'
   | 'follow'
-  | 'auth_twit';
+  | 'auth_twit'
+  | 'hashtag';
 
 export const PARAM_TYPES: ParamType[] = [
   'register',
@@ -104,7 +105,8 @@ export const PARAM_TYPES: ParamType[] = [
   'comment',
   'location',
   'follow',
-  'auth_twit'
+  'auth_twit',
+  'hashtag'
 ];
 
 export type Params = {

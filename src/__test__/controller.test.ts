@@ -687,7 +687,7 @@ describe('Metrics API Tests', () => {
       expect(response.body.detail).toBe('Invalid type');
     });
 
-    it('should creta a follow metric', async () => {
+    it('should create a follow metric', async () => {
       const metricData = {
         type: 'follow',
         createdAt: new Date().toISOString(),
@@ -704,6 +704,56 @@ describe('Metrics API Tests', () => {
       expect(response.body.data.username).toBe('testuser');
       expect(response.body.data.createdAt).toBe(metricData.createdAt);
       expect(response.body.data.metrics.amount).toBe(1);
+    });
+
+    it('should create a hashtag metric', async () => {
+      const metricData = {
+        type: 'hashtag',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          hashtag: 'test'
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('hashtag');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+      expect(response.body.data.metrics.hashtag).toBe('test');
+    });
+
+    it('should raise 400 if the hashtag field is not defined in hashtag metric', async () => {
+      const metricData = {
+        type: 'hashtag',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('MISSING_FIELD');
+      expect(response.body.detail).toBe('"hashtag" is required');
+    });
+
+    it('should raise 400 if the hashtag field is not a string in hashtag metric', async () => {
+      const metricData = {
+        type: 'hashtag',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          hashtag: 1
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(400);
+      expect(response.body.type).toBe('INVALID_HASHTAG');
+      expect(response.body.detail).toBe('"hashtag" must be a string');
     });
 
   });
@@ -1081,5 +1131,25 @@ describe('Metrics API Tests', () => {
 
       expect(response.body.data.twits.length).toBe(2);
     });
+
+    it('should get hashtag metrics', async () => {
+      const metricData = {
+        type: 'hashtag',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          hashtag: 'test'
+        }
+      };
+
+      await request(app).post('/metrics').send(metricData);
+
+      const response = await request(app).get('/metrics').query({ type: 'hashtag'});
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].amount).toBe(1);
+      expect(response.body.data[0].hashtag).toBe('test');
+      expect(response.body.data.length).toBe(1);
+    });
+
   });
 });
