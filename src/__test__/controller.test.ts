@@ -1146,8 +1146,7 @@ describe('Metrics API Tests', () => {
 
       const response = await request(app).get('/metrics').query({ type: 'hashtag'});
       expect(response.status).toBe(200);
-      expect(response.body.data[0].amount).toBe(1);
-      expect(response.body.data[0].hashtag).toBe('test');
+      expect(response.body.data[0].hashtags['test']).toBe(1);
       expect(response.body.data.length).toBe(1);
     });
 

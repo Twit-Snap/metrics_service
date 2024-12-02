@@ -365,11 +365,16 @@ export class MetricsRepository {
   }
 
   async getHashtagMetrics(): Promise<HashtagMetric[]> {
-    // Obtener todos los hashtags posibles
-    const hashtagQuery = `
-    SELECT DISTINCT (metrics->>'hashtag') AS hashtag
+    // Obtener todos los hashtags posibles con su frecuencia
+    const hashtagFrequencyQuery = `
+    SELECT 
+      (metrics->>'hashtag') AS hashtag,
+      COUNT(*)::int AS frequency
     FROM metrics
-    WHERE metric_type = 'hashtag';
+    WHERE metric_type = 'hashtag'
+    GROUP BY (metrics->>'hashtag')
+    ORDER BY frequency DESC
+    LIMIT 10;
   `;
 
     // Obtener las métricas por fecha
@@ -394,30 +399,36 @@ export class MetricsRepository {
   `;
 
     // Ejecutar ambas consultas en paralelo
-    const [hashtagResult, metricResult]: [QueryResult<{ hashtag: string }>, QueryResult<HashtagMetric>] = await Promise.all([
-      this.pool.query(hashtagQuery),
+    const [hashtagFrequencyResult, metricResult]: [QueryResult<{ hashtag: string }>, QueryResult<HashtagMetric>] = await Promise.all([
+      this.pool.query(hashtagFrequencyQuery),
       this.pool.query(metricQuery)
     ]);
 
-    // Extraer todos los hashtags posibles
-    const allHashtags = hashtagResult.rows.map(row => row.hashtag);
+    // Extraer los 10 hashtags más frecuentes
+    const topHashtags = hashtagFrequencyResult.rows.map(row => row.hashtag);
 
-    // Completar las métricas asegurando que cada fecha tenga todos los hashtags
+    // Completar las métricas asegurando que cada fecha tenga los 10 hashtags más frecuentes
     const completeMetrics = metricResult.rows.map(metric => {
       const row = { ...metric }; // Copia del objeto original de métricas
       row.hashtags = { ...row.hashtags }; // Copia los hashtags existentes
 
-      // Agregar los hashtags que faltan con valor 0
-      allHashtags.forEach(hashtag => {
+      // Agregar los hashtags que faltan con valor 0 (solo los 10 más usados)
+      topHashtags.forEach(hashtag => {
         if (!row.hashtags[hashtag]) {
           row.hashtags[hashtag] = 0;
         }
       });
+
+      // Filtrar para que solo queden los 10 hashtags más frecuentes
+      row.hashtags = Object.fromEntries(
+        Object.entries(row.hashtags).filter(([key]) => topHashtags.includes(key))
+      );
 
       return row;
     });
 
     return completeMetrics;
   }
+
 
 }

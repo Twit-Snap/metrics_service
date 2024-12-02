@@ -71,6 +71,11 @@ export interface  AuthTwitMetric {
   twits: TwitMetric[];
 }
 
+interface Hashtag {
+  hashtag: string;
+  amount: number;
+}
+
 export interface HashtagMetric {
   date: Date;
   hashtags: Record<string, number>;
