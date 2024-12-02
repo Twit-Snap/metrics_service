@@ -66,14 +66,9 @@ export interface TotalFollowMetric {
   total: number;
 }
 
-export interface  AuthTwitMetric {
+export interface AuthTwitMetric {
   total: number;
   twits: TwitMetric[];
-}
-
-interface Hashtag {
-  hashtag: string;
-  amount: number;
 }
 
 export interface HashtagMetric {

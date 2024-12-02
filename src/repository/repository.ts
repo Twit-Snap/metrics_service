@@ -13,7 +13,8 @@ import {
   LocationMetric,
   FollowMetric,
   TotalFollowMetric,
-  AuthTwitMetric, HashtagMetric
+  AuthTwitMetric,
+  HashtagMetric
 } from '../types/metric';
 
 export class MetricsRepository {
@@ -334,10 +335,7 @@ export class MetricsRepository {
     return result.rows;
   }
 
-
-  async getTwitsAuthMetrics(
-    baseDate?: Date
-  ): Promise<AuthTwitMetric> {
+  async getTwitsAuthMetrics(baseDate?: Date): Promise<AuthTwitMetric> {
     const twits = await this.getTwitMetrics('all', baseDate);
     const total = twits.reduce((acc, curr) => acc + curr.amount, 0);
 
@@ -399,10 +397,10 @@ export class MetricsRepository {
   `;
 
     // Ejecutar ambas consultas en paralelo
-    const [hashtagFrequencyResult, metricResult]: [QueryResult<{ hashtag: string }>, QueryResult<HashtagMetric>] = await Promise.all([
-      this.pool.query(hashtagFrequencyQuery),
-      this.pool.query(metricQuery)
-    ]);
+    const [hashtagFrequencyResult, metricResult]: [
+      QueryResult<{ hashtag: string }>,
+      QueryResult<HashtagMetric>
+    ] = await Promise.all([this.pool.query(hashtagFrequencyQuery), this.pool.query(metricQuery)]);
 
     // Extraer los 10 hashtags más frecuentes
     const topHashtags = hashtagFrequencyResult.rows.map(row => row.hashtag);
@@ -429,6 +427,4 @@ export class MetricsRepository {
 
     return completeMetrics;
   }
-
-
 }

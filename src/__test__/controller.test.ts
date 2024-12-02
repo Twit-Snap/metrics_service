@@ -639,7 +639,7 @@ describe('Metrics API Tests', () => {
         createdAt: new Date().toISOString(),
         username: 'testuser',
         metrics: {
-          amount: 1,
+          amount: 1
         }
       };
 
@@ -667,8 +667,6 @@ describe('Metrics API Tests', () => {
       expect(response.body.type).toBe('INVALID_FOLLOWED');
       expect(response.body.detail).toBe('"followed" must be a boolean');
     });
-
-
 
     it('should raise 400 if the type is invalid', async () => {
       const metricData = {
@@ -755,7 +753,6 @@ describe('Metrics API Tests', () => {
       expect(response.body.type).toBe('INVALID_HASHTAG');
       expect(response.body.detail).toBe('"hashtag" must be a string');
     });
-
   });
 
   describe('GET /metrics', () => {
@@ -1103,7 +1100,7 @@ describe('Metrics API Tests', () => {
       };
 
       const post = await request(app).post('/metrics').send(metricData);
-      console.log(post.body.data)
+      console.log(post.body.data);
 
       const response = await request(app).get('/metrics').query({ type: 'twit', auth: 'true' });
       expect(response.status).toBe(200);
@@ -1116,13 +1113,13 @@ describe('Metrics API Tests', () => {
     it('should get auth twit metrics with many users in different dates', async () => {
       const metricData = {
         type: 'twit',
-        createdAt: new Date("2024-11-29").toISOString(),
+        createdAt: new Date('2024-11-29').toISOString(),
         username: 'testuser',
         metrics: {}
       };
 
       const post = await request(app).post('/metrics').send(metricData);
-      console.log(post.body.data)
+      console.log(post.body.data);
 
       const response = await request(app).get('/metrics').query({ type: 'twit', auth: 'true' });
       expect(response.status).toBe(200);
@@ -1144,11 +1141,10 @@ describe('Metrics API Tests', () => {
 
       await request(app).post('/metrics').send(metricData);
 
-      const response = await request(app).get('/metrics').query({ type: 'hashtag'});
+      const response = await request(app).get('/metrics').query({ type: 'hashtag' });
       expect(response.status).toBe(200);
       expect(response.body.data[0].hashtags['test']).toBe(1);
       expect(response.body.data.length).toBe(1);
     });
-
   });
 });

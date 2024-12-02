@@ -10,7 +10,9 @@ import {
   BlockedMetric,
   TwitMetric,
   LocationMetric,
-  TotalFollowMetric, AuthTwitMetric, HashtagMetric
+  TotalFollowMetric,
+  AuthTwitMetric,
+  HashtagMetric
 } from '../types/metric';
 import axios from 'axios';
 import { ServiceUnavailableError } from '../types/customErrors';
@@ -28,7 +30,6 @@ export class MetricService {
     }
     return await this.metricsRepository.createMetric(metricsData);
   }
-
 
   private async fetchLocation(metricsData: MetricDataDto) {
     try {
@@ -75,8 +76,7 @@ export class MetricService {
       | LocationMetric[]
       | TotalFollowMetric
       | AuthTwitMetric
-      | HashtagMetric[]
-      = [];
+      | HashtagMetric[] = [];
 
     if (params.type == 'register') {
       metrics = await this.metricsRepository.getRegisterMetrics();
@@ -89,9 +89,9 @@ export class MetricService {
     } else if (params.type == 'blocked') {
       metrics = await this.metricsRepository.getBlockedMetrics();
     } else if (params.type == 'twit') {
-      if(params.auth) {
+      if (params.auth) {
         metrics = await this.metricsRepository.getTwitsAuthMetrics();
-      }else {
+      } else {
         metrics = await this.metricsRepository.getTwitMetricsByUsername(
           params.username,
           params.dateRange
@@ -115,14 +115,10 @@ export class MetricService {
     } else if (params.type == 'location') {
       metrics = await this.metricsRepository.getLocationMetrics();
     } else if (params.type == 'follow') {
-      metrics = await this.metricsRepository.getFollowersMetrics(
-        params.username,
-        params.dateRange
-      );
-    }else if(params.type == 'hashtag'){
+      metrics = await this.metricsRepository.getFollowersMetrics(params.username, params.dateRange);
+    } else if (params.type == 'hashtag') {
       metrics = await this.metricsRepository.getHashtagMetrics();
     }
     return metrics;
   }
 }
-

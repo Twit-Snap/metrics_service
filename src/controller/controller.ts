@@ -14,8 +14,7 @@ export class MetricController {
   async createMetrics(req: Request, res: Response, next: NextFunction) {
     try {
       const metricsData: MetricDataDto = req.body;
-      this.
-      validateParameters(metricsData);
+      this.validateParameters(metricsData);
       const metric = await this.metricService.createMetrics(metricsData);
       console.log('Successfully created metric', metric);
       res.status(201).json({ data: metric });
@@ -80,15 +79,14 @@ export class MetricController {
       this.validateBlockedMetrics(metricsData.metrics);
     } else if (metricsData.type === 'location') {
       this.validateLocationMetrics(metricsData);
-    }else if(metricsData.type === 'follow') {
+    } else if (metricsData.type === 'follow') {
       this.validateFollowMetric(metricsData.metrics);
-    }else if(metricsData.type === 'hashtag'){
+    } else if (metricsData.type === 'hashtag') {
       this.validateHashtagMetric(metricsData.metrics);
     } else {
       throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
     }
   }
-
 
   private isValidCoordinate(latitude: number, longitude: number): boolean {
     const isLatitudeValid = latitude >= -90 && latitude <= 90;
@@ -192,8 +190,12 @@ export class MetricController {
       if (typeof metrics.amount !== 'number') {
         throw new ValidationError('metrics', '"amount" must be a number', 'INVALID_AMOUNT');
       }
-      if(metrics.amount < 0){
-        throw new ValidationError('metrics', '"amount" must be a positive number', 'INVALID_AMOUNT');
+      if (metrics.amount < 0) {
+        throw new ValidationError(
+          'metrics',
+          '"amount" must be a positive number',
+          'INVALID_AMOUNT'
+        );
       }
     } else {
       throw new ValidationError('metrics', '"amount" is required', 'MISSING_FIELD');

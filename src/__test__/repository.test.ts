@@ -3,7 +3,6 @@ import { DatabasePool } from '../repository/db';
 import { MetricsRepository } from '../repository/repository';
 import { MetricDataDto } from '../types/metric';
 import dotenv from 'dotenv';
-import { ValidationError } from '../types/customErrors';
 
 dotenv.config({ path: '../../.env.dev' });
 
@@ -799,8 +798,6 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-
-
       const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
       expect(metrics).toBeDefined();
       expect(metrics.total).toBe(3);
@@ -842,7 +839,6 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-
       const metrics = await metricsRepository.getFollowersMetrics('testuser', 'week', today);
       expect(metrics).toBeDefined();
       expect(metrics.total).toBe(0);
@@ -850,7 +846,6 @@ describe('Metrics Repository', () => {
         anotherMetricData.createdAt.toISOString().split('T')[0]
       );
       expect(metrics.follows[0].amount).toBe(1);
-
     });
 
     it('should fetch all twits if all is pass by parameter in dateRange', async () => {
@@ -891,7 +886,7 @@ describe('Metrics Repository', () => {
       expect(metrics.total).toBe(3);
       expect(metrics.twits.length).toBe(1);
       expect(metrics.twits[0].amount).toBe(3);
-    })
+    });
 
     it('should get hashtag metrics', async () => {
       const metricsRepository = new MetricsRepository(pool);
@@ -899,7 +894,7 @@ describe('Metrics Repository', () => {
         type: 'hashtag',
         createdAt: new Date(),
         username: 'testuser',
-        metrics: {hashtag: 'test'}
+        metrics: { hashtag: 'test' }
       };
 
       await metricsRepository.createMetric(metricData);
@@ -911,38 +906,35 @@ describe('Metrics Repository', () => {
       expect(metrics[0].hashtags['test']).toBeDefined();
       expect(metrics[0].hashtags['test']).toBe(1);
       expect(metrics.length).toBe(1);
-
-
     });
 
     it('should get hashtag metrics group by date and then by hashtag type', async () => {
       const metricsRepository = new MetricsRepository(pool);
       const metricData: MetricDataDto = {
         type: 'hashtag',
-        createdAt: new Date("2024-11-29"),
+        createdAt: new Date('2024-11-29'),
         username: 'testuser',
-        metrics: {hashtag: 'test'}
+        metrics: { hashtag: 'test' }
       };
 
       const anotherMetricData: MetricDataDto = {
         type: 'hashtag',
-        createdAt: new Date("2024-11-29"),
+        createdAt: new Date('2024-11-29'),
         username: 'testuser',
-        metrics: {hashtag: 'test2'}
+        metrics: { hashtag: 'test2' }
       };
 
       const thirdMetricData: MetricDataDto = {
         type: 'hashtag',
         createdAt: new Date(),
         username: 'testuser',
-        metrics: {hashtag: 'test'}
+        metrics: { hashtag: 'test' }
       };
 
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(metricData);
       await metricsRepository.createMetric(anotherMetricData);
       await metricsRepository.createMetric(thirdMetricData);
-
 
       const metrics = await metricsRepository.getHashtagMetrics();
       expect(metrics).toBeDefined();
@@ -959,7 +951,6 @@ describe('Metrics Repository', () => {
       );
 
       expect(metrics.length).toBe(2);
-
     });
   });
 });
