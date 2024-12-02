@@ -257,6 +257,29 @@ describe('Metrics Repository', () => {
       expect(metric.type).toEqual(metricData.type);
       expect(metric.username).toEqual(metricData.username);
     });
+
+
+    it('should create a new login metric', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'password',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 1000
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
+
   });
 
   describe('getRegisterMetrics', () => {
@@ -953,6 +976,62 @@ describe('Metrics Repository', () => {
       );
 
       expect(metrics.length).toBe(2);
+    });
+
+    it('should return password recovery metrics', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'password',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 1000
+        }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getPasswordRecoveryMetrics();
+      console.log('metrics: ', metrics);
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBeGreaterThan(0);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[0].recoveryAttempts).toBe(1);
+      expect(metrics[0].averageRecoveryTime).toBe(1000);
+      expect(metrics[0].successfulRecoveries).toBe(1);
+      expect(metrics[0].failedRecoveryAttempts).toBe(0);
+    });
+
+    it('should return multiples password recovery metrics', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'password',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 1000
+        }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+
+      const metrics = await metricsRepository.getPasswordRecoveryMetrics();
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBeGreaterThan(0);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[0].recoveryAttempts).toBe(3);
+      expect(metrics[0].averageRecoveryTime).toBe(1000);
+      expect(metrics[0].successfulRecoveries).toBe(3);
+      expect(metrics[0].failedRecoveryAttempts).toBe(0);
     });
   });
 });

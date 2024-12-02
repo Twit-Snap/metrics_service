@@ -12,7 +12,7 @@ import {
   LocationMetric,
   TotalFollowMetric,
   AuthTwitMetric,
-  HashtagMetric
+  HashtagMetric, PasswordRecoveryMetric
 } from '../types/metric';
 import axios from 'axios';
 import { ServiceUnavailableError } from '../types/customErrors';
@@ -65,6 +65,7 @@ export class MetricService {
     | TotalFollowMetric
     | AuthTwitMetric
     | HashtagMetric[]
+    | PasswordRecoveryMetric[]
   > {
     let metrics:
       | RegisterMetric[]
@@ -76,7 +77,8 @@ export class MetricService {
       | LocationMetric[]
       | TotalFollowMetric
       | AuthTwitMetric
-      | HashtagMetric[] = [];
+      | HashtagMetric[]
+      | PasswordRecoveryMetric[] = [];
 
     if (params.type == 'register') {
       metrics = await this.metricsRepository.getRegisterMetrics();
@@ -86,6 +88,9 @@ export class MetricService {
       metrics = await this.metricsRepository.getLoginMetrics();
     } else if (params.type == 'login_with_provider') {
       metrics = await this.metricsRepository.getLoginWithProviderMetrics();
+    }else if (params.type == 'password') {
+      metrics = await this.metricsRepository.getPasswordRecoveryMetrics();
+
     } else if (params.type == 'blocked') {
       metrics = await this.metricsRepository.getBlockedMetrics();
     } else if (params.type == 'twit') {

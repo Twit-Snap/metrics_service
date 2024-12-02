@@ -754,6 +754,28 @@ describe('Metrics API Tests', () => {
       expect(response.body.type).toBe('INVALID_HASHTAG');
       expect(response.body.detail).toBe('"hashtag" must be a string');
     });
+
+
+    it('should create a password recovery metric', async () => {
+      const metricData = {
+        type: 'password',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 500
+        }
+      };
+
+      const response = await request(app).post('/metrics').send(metricData);
+
+      expect(response.status).toBe(201);
+      expect(response.body.data.type).toBe('password');
+      expect(response.body.data.username).toBe('testuser');
+      expect(response.body.data.createdAt).toBe(metricData.createdAt);
+      expect(response.body.data.metrics.success).toBe(true);
+      expect(response.body.data.metrics.event_time).toBe(500);
+    });
   });
 
   describe('GET /metrics', () => {
@@ -1145,6 +1167,28 @@ describe('Metrics API Tests', () => {
       const response = await request(app).get('/metrics').query({ type: 'hashtag' });
       expect(response.status).toBe(200);
       expect(response.body.data[0].hashtags['test']).toBe(1);
+      expect(response.body.data.length).toBe(1);
+    });
+
+    it('should get password recovery metrics', async () => {
+      const metricData = {
+        type: 'password',
+        createdAt: new Date().toISOString(),
+        username: 'testuser',
+        metrics: {
+          success: true,
+          event_time: 500
+        }
+      };
+
+      await request(app).post('/metrics').send(metricData);
+
+      const response = await request(app).get('/metrics').query({ type: 'password' });
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].recoveryAttempts).toBe(1);
+      expect(response.body.data[0].successfulRecoveries).toBe(1);
+      expect(response.body.data[0].failedRecoveryAttempts).toBe(0);
+      expect(response.body.data[0].averageRecoveryTime).toBe(500);
       expect(response.body.data.length).toBe(1);
     });
   });
