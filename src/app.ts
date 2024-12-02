@@ -6,7 +6,7 @@ import metricRoutes from './routes/routes';
 import { errorHandler } from './middleware/errorHandler';
 import { logMiddleware } from './middleware/logMiddleware';
 
-function initializeEnvironment() {
+export function initializeEnvironment() {
   // Determine environment
   const env = process.env.NODE_ENV || 'development';
   const envFilePath =
@@ -29,10 +29,9 @@ function initializeEnvironment() {
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const cors = require('cors');
 const app = express();
-const port = process.env.PORT || 4000;
 
 // Function to test the database connection
-async function testDatabaseConnection(retries = 5, delay = 5000) {
+export async function testDatabaseConnection(retries = 5, delay = 5000) {
   while (retries > 0) {
     try {
       const pool = DatabasePool.getInstance();
@@ -53,39 +52,24 @@ async function testDatabaseConnection(retries = 5, delay = 5000) {
   }
 }
 
-// Start the server and connect to the database
-async function startServer() {
-  // Initialize environment variables
-  initializeEnvironment();
+initializeEnvironment();
 
-  await testDatabaseConnection();
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(logMiddleware);
 
-  // Middleware
-  app.use(cors());
-  app.use(express.json());
-  app.use(logMiddleware);
+// Routes
+app.use('/metrics', metricRoutes);
 
-  // Routes
-  app.use('/metrics', metricRoutes);
-
-  // Error handling middleware
-  app.use(errorHandler);
-
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-}
+// Error handling middleware
+app.use(errorHandler);
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM signal received: closing HTTP server');
   await DatabasePool.closePool();
   process.exit(0);
-});
-
-startServer().catch(err => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
 });
 
 export default app;

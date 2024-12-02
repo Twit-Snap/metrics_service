@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+/* ignore coverage */
 // db.ts
 import { Pool } from 'pg';
 
@@ -17,8 +19,7 @@ export class DatabasePool {
   }
 
   private static createPool() {
-    const databaseUrl =
-      process.env.DATABASE_URL || 'postgresql://myuser:mypassword@localhost:5431/twitter_metrics';
+    const databaseUrl = process.env.DATABASE_URL;
     const displayUrl = process.env.NODE_ENV === 'development' ? databaseUrl : '****';
 
     console.log('Creating a new database pool', displayUrl);

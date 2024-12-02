@@ -1,0 +1,61 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches: '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: twitter_metrics
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Initialize PostgreSQL
+        run: |
+          # Wait for PostgreSQL to be ready
+          until PGPASSWORD=postgres psql -h localhost -U postgres -c '\q'; do
+            sleep 1
+          done
+          # Run the initialization script
+          PGPASSWORD=postgres psql -h localhost -U postgres -d twitter_metrics -f init.sql
+        env:
+          PGPASSWORD: postgres
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run integration tests
+        run: npm run ci-test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/twitter_metrics
+          CI: true
+          API_LOCATION_URL: https://api.opencagedata.com/geocode/v1/json
+          API_LOCATION_KEY: ${{ secrets.API_LOCATION_KEY }}

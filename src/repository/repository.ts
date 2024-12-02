@@ -206,7 +206,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'twit', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'twit', baseDate);
   }
 
   async getLikeMetricsByUsername(
@@ -214,7 +214,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'like', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'like', baseDate);
   }
 
   async getRetwitMetricsByUsername(
@@ -222,7 +222,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'retwit', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'retwit', baseDate);
   }
 
   async getCommentMetricsByUsername(
@@ -230,7 +230,7 @@ export class MetricsRepository {
     dateRange: DateRange | undefined,
     baseDate?: Date
   ): Promise<TwitMetric[]> {
-    return this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
+    return await this.getMetricsByUsername<TwitMetric>(username, dateRange, 'comment', baseDate);
   }
 
   private async getTotalFollowersMetrics(): Promise<number> {

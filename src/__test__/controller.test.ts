@@ -2,13 +2,14 @@
 
 import request from 'supertest';
 import { Pool } from 'pg';
-import app from '../app';
+import app, { initializeEnvironment } from '../app';
 import { DatabasePool } from '../repository/db';
 
 describe('Metrics API Tests', () => {
   let pool: Pool;
 
   beforeAll(async () => {
+    initializeEnvironment();
     pool = DatabasePool.getInstance();
     await pool.query('DELETE FROM metrics');
   });

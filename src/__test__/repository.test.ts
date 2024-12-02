@@ -3,6 +3,7 @@ import { DatabasePool } from '../repository/db';
 import { MetricsRepository } from '../repository/repository';
 import { MetricDataDto } from '../types/metric';
 import dotenv from 'dotenv';
+import { initializeEnvironment } from '../app';
 
 dotenv.config({ path: '../../.env.dev' });
 
@@ -10,6 +11,7 @@ describe('Metrics Repository', () => {
   let pool: Pool;
 
   beforeAll(async () => {
+    initializeEnvironment();
     pool = DatabasePool.getInstance();
     await pool.query('DELETE FROM metrics');
   });
