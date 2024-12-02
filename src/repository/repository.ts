@@ -12,9 +12,10 @@ import {
   DateRange,
   LocationMetric,
   FollowMetric,
-  TotalFollowMetric
+  TotalFollowMetric,
+  AuthTwitMetric,
+  HashtagMetric
 } from '../types/metric';
-import { ValidationError } from '../types/customErrors';
 
 export class MetricsRepository {
   private pool: Pool;
@@ -174,6 +175,32 @@ export class MetricsRepository {
     return result.rows;
   }
 
+  private async getTwitMetrics(
+    dateRange: DateRange | undefined,
+    baseDate?: Date
+  ): Promise<TwitMetric[]> {
+    const { groupByGranularity, dateCondition } = this.selectGranurality(dateRange, baseDate);
+
+    const query = `
+      SELECT 
+          ${groupByGranularity} AS "date",
+          TO_CHAR(${groupByGranularity}, 'FMDay') AS "dateName",
+          COUNT(*)::int AS "amount"
+      FROM 
+          metrics
+      WHERE 
+          metric_type = $1 
+          AND ${dateCondition} -- Filtrar según el rango de fechas
+      GROUP BY 
+          ${groupByGranularity} --, TO_CHAR( ${groupByGranularity}, 'FMDay') -- Agrupación según la granularidad definida
+      ORDER BY 
+          ${groupByGranularity}; -- Ordenar los resultados por la fecha agrupada
+  `;
+
+    const result: QueryResult<TwitMetric> = await this.pool.query(query, ['twit']);
+    return result.rows;
+  }
+
   async getTwitMetricsByUsername(
     username: string | undefined,
     dateRange: DateRange | undefined,
@@ -237,10 +264,14 @@ export class MetricsRepository {
 
     return { follows: followsInTime, total: totalFollowers };
   }
+
   private selectGranurality(
     dateRange: DateRange | undefined,
     baseDate: Date | undefined
-  ): { dateCondition: string; groupByGranularity: string } {
+  ): {
+    dateCondition: string;
+    groupByGranularity: string;
+  } {
     const referenceDate = baseDate ? `'${baseDate.toISOString().split('T')[0]}'` : 'CURRENT_DATE';
 
     let dateCondition: string;
@@ -269,7 +300,8 @@ export class MetricsRepository {
         groupByGranularity = "date_trunc('day', created_at)";
         break;
       default:
-        throw new ValidationError('dateRange', 'Invalid date range', 'INVALID_DATE_RANGE');
+        dateCondition = 'TRUE';
+        groupByGranularity = "date_trunc('day', created_at)";
     }
 
     return { dateCondition, groupByGranularity };
@@ -303,6 +335,13 @@ export class MetricsRepository {
     return result.rows;
   }
 
+  async getTwitsAuthMetrics(baseDate?: Date): Promise<AuthTwitMetric> {
+    const twits = await this.getTwitMetrics('all', baseDate);
+    const total = twits.reduce((acc, curr) => acc + curr.amount, 0);
+
+    return { twits: twits, total: total };
+  }
+
   async getLocationMetrics(): Promise<LocationMetric[]> {
     const query = `
       SELECT 
@@ -321,5 +360,71 @@ export class MetricsRepository {
     const result: QueryResult<LocationMetric> = await this.pool.query(query);
 
     return result.rows;
+  }
+
+  async getHashtagMetrics(): Promise<HashtagMetric[]> {
+    // Obtener todos los hashtags posibles con su frecuencia
+    const hashtagFrequencyQuery = `
+    SELECT 
+      (metrics->>'hashtag') AS hashtag,
+      COUNT(*)::int AS frequency
+    FROM metrics
+    WHERE metric_type = 'hashtag'
+    GROUP BY (metrics->>'hashtag')
+    ORDER BY frequency DESC
+    LIMIT 10;
+  `;
+
+    // Obtener las métricas por fecha
+    const metricQuery = `
+    SELECT 
+        date,
+        jsonb_object_agg(hashtag, amount) AS hashtags
+    FROM (
+        SELECT 
+            DATE(created_at) AS date,
+            (metrics->>'hashtag')::text AS hashtag,
+            COUNT(*)::int AS amount
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'hashtag'
+        GROUP BY 
+            DATE(created_at), (metrics->>'hashtag')
+    ) subquery
+    GROUP BY date
+    ORDER BY date;
+  `;
+
+    // Ejecutar ambas consultas en paralelo
+    const [hashtagFrequencyResult, metricResult]: [
+      QueryResult<{ hashtag: string }>,
+      QueryResult<HashtagMetric>
+    ] = await Promise.all([this.pool.query(hashtagFrequencyQuery), this.pool.query(metricQuery)]);
+
+    // Extraer los 10 hashtags más frecuentes
+    const topHashtags = hashtagFrequencyResult.rows.map(row => row.hashtag);
+
+    // Completar las métricas asegurando que cada fecha tenga los 10 hashtags más frecuentes
+    const completeMetrics = metricResult.rows.map(metric => {
+      const row = { ...metric }; // Copia del objeto original de métricas
+      row.hashtags = { ...row.hashtags }; // Copia los hashtags existentes
+
+      // Agregar los hashtags que faltan con valor 0 (solo los 10 más usados)
+      topHashtags.forEach(hashtag => {
+        if (!row.hashtags[hashtag]) {
+          row.hashtags[hashtag] = 0;
+        }
+      });
+
+      // Filtrar para que solo queden los 10 hashtags más frecuentes
+      row.hashtags = Object.fromEntries(
+        Object.entries(row.hashtags).filter(([key]) => topHashtags.includes(key))
+      );
+
+      return row;
+    });
+
+    return completeMetrics;
   }
 }

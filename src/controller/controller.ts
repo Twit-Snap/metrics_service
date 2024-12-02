@@ -31,7 +31,8 @@ export class MetricController {
         username: req.query.username ? req.query.username.toString() : '',
         dateRange: validDateRanges.includes(req.query.dateRange?.toString() as DateRange)
           ? (req.query.dateRange?.toString() as DateRange)
-          : 'week'
+          : 'week',
+        auth: req.query.auth === 'true'
       };
       this.validateTwitMetrics(params);
       this.validateParamsType(params);
@@ -78,13 +79,14 @@ export class MetricController {
       this.validateBlockedMetrics(metricsData.metrics);
     } else if (metricsData.type === 'location') {
       this.validateLocationMetrics(metricsData);
-    }else if(metricsData.type === 'follow') {
+    } else if (metricsData.type === 'follow') {
       this.validateFollowMetric(metricsData.metrics);
+    } else if (metricsData.type === 'hashtag') {
+      this.validateHashtagMetric(metricsData.metrics);
     } else {
       throw new ValidationError('type', 'Invalid type', 'INVALID_TYPE');
     }
   }
-
 
   private isValidCoordinate(latitude: number, longitude: number): boolean {
     const isLatitudeValid = latitude >= -90 && latitude <= 90;
@@ -159,7 +161,7 @@ export class MetricController {
 
   private validateTwitMetrics(params: Params) {
     if (
-      params.type === 'twit' ||
+      (params.type === 'twit' && !params.auth) ||
       params.type === 'like' ||
       params.type === 'retwit' ||
       params.type === 'comment'
@@ -188,11 +190,25 @@ export class MetricController {
       if (typeof metrics.amount !== 'number') {
         throw new ValidationError('metrics', '"amount" must be a number', 'INVALID_AMOUNT');
       }
-      if(metrics.amount < 0){
-        throw new ValidationError('metrics', '"amount" must be a positive number', 'INVALID_AMOUNT');
+      if (metrics.amount < 0) {
+        throw new ValidationError(
+          'metrics',
+          '"amount" must be a positive number',
+          'INVALID_AMOUNT'
+        );
       }
     } else {
       throw new ValidationError('metrics', '"amount" is required', 'MISSING_FIELD');
+    }
+  }
+
+  private validateHashtagMetric(metrics: Record<string, string | number | boolean | Date>) {
+    if ('hashtag' in metrics) {
+      if (typeof metrics.hashtag !== 'string') {
+        throw new ValidationError('metrics', '"hashtag" must be a string', 'INVALID_HASHTAG');
+      }
+    } else {
+      throw new ValidationError('metrics', '"hashtag" is required', 'MISSING_FIELD');
     }
   }
 }

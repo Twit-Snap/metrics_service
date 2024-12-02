@@ -65,7 +65,17 @@ export interface TotalFollowMetric {
   follows: FollowMetric[];
   total: number;
 }
-export type DateRange = 'week' | 'month' | 'year';
+
+export interface AuthTwitMetric {
+  total: number;
+  twits: TwitMetric[];
+}
+
+export interface HashtagMetric {
+  date: Date;
+  hashtags: Record<string, number>;
+}
+export type DateRange = 'week' | 'month' | 'year' | 'all';
 
 export type ParamType =
   | 'register'
@@ -78,7 +88,9 @@ export type ParamType =
   | 'retwit'
   | 'comment'
   | 'location'
-  | 'follow';
+  | 'follow'
+  | 'auth_twit'
+  | 'hashtag';
 
 export const PARAM_TYPES: ParamType[] = [
   'register',
@@ -92,10 +104,13 @@ export const PARAM_TYPES: ParamType[] = [
   'comment',
   'location',
   'follow',
+  'auth_twit',
+  'hashtag'
 ];
 
 export type Params = {
   type: string;
   username?: string;
   dateRange?: DateRange;
+  auth?: boolean;
 };

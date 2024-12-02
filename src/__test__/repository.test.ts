@@ -237,6 +237,26 @@ describe('Metrics Repository', () => {
       expect(metric.type).toEqual(metricData.type);
       expect(metric.username).toEqual(metricData.username);
     });
+
+    it('should create a new metric with hashtag', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date('2024-11-10'),
+        username: 'testuser',
+        metrics: {
+          hashtag: 'test'
+        }
+      };
+
+      const metric = await metricsRepository.createMetric(metricData);
+      expect(metric).toBeDefined();
+      expect(metric.createdAt).toEqual(metricData.createdAt);
+      expect(metric.metrics).toEqual(metricData.metrics);
+      expect(metric.type).toEqual(metricData.type);
+      expect(metric.username).toEqual(metricData.username);
+    });
   });
 
   describe('getRegisterMetrics', () => {
@@ -449,12 +469,12 @@ describe('Metrics Repository', () => {
       await metricsRepository.createMetric(aMetricData);
       await metricsRepository.createMetric(anotherMetricData);
 
-      const actuaDate = new Date('2024-11-21');
+      const actualDate = new Date('2024-11-21');
 
       const metrics = await metricsRepository.getTwitMetricsByUsername(
         'testuser',
         'week',
-        actuaDate
+        actualDate
       );
       console.log('metrics: ', metrics);
       expect(metrics).toBeDefined();
@@ -828,6 +848,111 @@ describe('Metrics Repository', () => {
         anotherMetricData.createdAt.toISOString().split('T')[0]
       );
       expect(metrics.follows[0].amount).toBe(1);
+    });
+
+    it('should fetch all twits if all is pass by parameter in dateRange', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getTwitMetricsByUsername('testuser', 'all');
+      expect(metrics).toBeDefined();
+      expect(metrics.length).toBe(1);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[0].amount).toBe(3);
+    });
+
+    it('should get auth twits metrics', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'twit',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: {}
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      const metrics = await metricsRepository.getTwitsAuthMetrics();
+      expect(metrics).toBeDefined();
+      expect(metrics.total).toBe(3);
+      expect(metrics.twits.length).toBe(1);
+      expect(metrics.twits[0].amount).toBe(3);
+    });
+
+    it('should get hashtag metrics', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: { hashtag: 'test' }
+      };
+
+      await metricsRepository.createMetric(metricData);
+
+      const metrics = await metricsRepository.getHashtagMetrics();
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+      expect(metrics[0].hashtags['test']).toBeDefined();
+      expect(metrics[0].hashtags['test']).toBe(1);
+      expect(metrics.length).toBe(1);
+    });
+
+    it('should get hashtag metrics group by date and then by hashtag type', async () => {
+      const metricsRepository = new MetricsRepository(pool);
+      const metricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date('2024-11-29'),
+        username: 'testuser',
+        metrics: { hashtag: 'test' }
+      };
+
+      const anotherMetricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date('2024-11-29'),
+        username: 'testuser',
+        metrics: { hashtag: 'test2' }
+      };
+
+      const thirdMetricData: MetricDataDto = {
+        type: 'hashtag',
+        createdAt: new Date(),
+        username: 'testuser',
+        metrics: { hashtag: 'test' }
+      };
+
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(metricData);
+      await metricsRepository.createMetric(anotherMetricData);
+      await metricsRepository.createMetric(thirdMetricData);
+
+      const metrics = await metricsRepository.getHashtagMetrics();
+      expect(metrics).toBeDefined();
+
+      expect(metrics[0].hashtags['test']).toBe(2);
+      expect(metrics[0].hashtags['test2']).toBe(1);
+      expect(metrics[0].date.toISOString().split('T')[0]).toBe(
+        metricData.createdAt.toISOString().split('T')[0]
+      );
+
+      expect(metrics[1].hashtags['test']).toBe(1);
+      expect(metrics[1].date.toISOString().split('T')[0]).toBe(
+        thirdMetricData.createdAt.toISOString().split('T')[0]
+      );
+
+      expect(metrics.length).toBe(2);
     });
   });
 });

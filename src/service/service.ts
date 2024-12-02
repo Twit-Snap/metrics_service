@@ -10,7 +10,9 @@ import {
   BlockedMetric,
   TwitMetric,
   LocationMetric,
-  TotalFollowMetric
+  TotalFollowMetric,
+  AuthTwitMetric,
+  HashtagMetric
 } from '../types/metric';
 import axios from 'axios';
 import { ServiceUnavailableError } from '../types/customErrors';
@@ -28,7 +30,6 @@ export class MetricService {
     }
     return await this.metricsRepository.createMetric(metricsData);
   }
-
 
   private async fetchLocation(metricsData: MetricDataDto) {
     try {
@@ -62,6 +63,8 @@ export class MetricService {
     | TwitMetric[]
     | LocationMetric[]
     | TotalFollowMetric
+    | AuthTwitMetric
+    | HashtagMetric[]
   > {
     let metrics:
       | RegisterMetric[]
@@ -71,7 +74,9 @@ export class MetricService {
       | BlockedMetric[]
       | TwitMetric[]
       | LocationMetric[]
-      | TotalFollowMetric = [];
+      | TotalFollowMetric
+      | AuthTwitMetric
+      | HashtagMetric[] = [];
 
     if (params.type == 'register') {
       metrics = await this.metricsRepository.getRegisterMetrics();
@@ -84,10 +89,14 @@ export class MetricService {
     } else if (params.type == 'blocked') {
       metrics = await this.metricsRepository.getBlockedMetrics();
     } else if (params.type == 'twit') {
-      metrics = await this.metricsRepository.getTwitMetricsByUsername(
-        params.username,
-        params.dateRange
-      );
+      if (params.auth) {
+        metrics = await this.metricsRepository.getTwitsAuthMetrics();
+      } else {
+        metrics = await this.metricsRepository.getTwitMetricsByUsername(
+          params.username,
+          params.dateRange
+        );
+      }
     } else if (params.type == 'like') {
       metrics = await this.metricsRepository.getLikeMetricsByUsername(
         params.username,
@@ -106,12 +115,10 @@ export class MetricService {
     } else if (params.type == 'location') {
       metrics = await this.metricsRepository.getLocationMetrics();
     } else if (params.type == 'follow') {
-      metrics = await this.metricsRepository.getFollowersMetrics(
-        params.username,
-        params.dateRange
-      );
+      metrics = await this.metricsRepository.getFollowersMetrics(params.username, params.dateRange);
+    } else if (params.type == 'hashtag') {
+      metrics = await this.metricsRepository.getHashtagMetrics();
     }
-
     return metrics;
   }
 }

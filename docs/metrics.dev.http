@@ -6,7 +6,7 @@ POST {{url}}/metrics
 Content-Type: application/json
 
 {
-    "createdAt": "2024-11-06",
+    "createdAt": "2024-11-07",
     "type": "register",
     "username": "usernameTest",
     "metrics": {
@@ -24,7 +24,6 @@ Content-Type: application/json
   "type": "register_with_provider",
   "username": "usernameTest",
   "metrics": {
-    "provider": "google"
   }
 }
 
@@ -70,7 +69,7 @@ Content-Type: application/json
 }
 
 ### GET register metrics
-GET {{url}}/metrics/register?type=register
+GET {{url}}/metrics?type=register
 Content-Type: application/json
 
 ### GET register with provider metrics
@@ -102,3 +101,34 @@ Content-Type: application/json
 ### GET location metrics
 GET {{url}}/metrics?type=location
 Content-Type: application/json
+
+
+### POST Create Auth Twitter metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2024-11-30",
+  "type": "twit",
+  "username": "b",
+  "metrics": {}
+}
+
+### GET Auth Twitter metrics
+GET {{url}}/metrics?type=twit&auth=true
+Content-Type: application/json
+
+
+### POST Create hashtag metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2024-11-27",
+  "type": "hashtag",
+  "username": "b",
+  "metrics": {
+    "hashtag": "test4"
+  }
+}
+
