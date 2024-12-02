@@ -132,3 +132,18 @@ Content-Type: application/json
   }
 }
 
+### POST Create password metric
+POST {{url}}/metrics
+Content-Type: application/json
+
+{
+  "createdAt": "2021-10-10",
+  "type": "password",
+  "username": "usernameTest",
+  "metrics": {
+    "success": true,
+    "event_time": 20000
+
+  }
+}
+
