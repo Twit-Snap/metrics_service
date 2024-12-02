@@ -14,7 +14,7 @@ import {
   FollowMetric,
   TotalFollowMetric,
   AuthTwitMetric,
-  HashtagMetric
+  HashtagMetric, PasswordRecoveryMetric
 } from '../types/metric';
 
 export class MetricsRepository {
@@ -426,5 +426,28 @@ export class MetricsRepository {
     });
 
     return completeMetrics;
+  }
+
+  async getPasswordRecoveryMetrics(): Promise<PasswordRecoveryMetric[]> {
+    const query = `
+        SELECT 
+            DATE(created_at) AS "date",
+             COUNT(*)::int AS "recoveryAttempts", 
+            SUM(CASE WHEN (metrics->>'success')::boolean THEN 1 ELSE 0 END)::int AS "successfulRecoveries",
+            SUM(CASE WHEN (metrics->>'success')::boolean THEN 0 ELSE 1 END)::int AS "failedRecoveryAttempts",
+            AVG((metrics->>'event_time')::float)::float AS "averageRecoveryTime"
+        FROM 
+            metrics
+        WHERE 
+            metric_type = 'password'
+        GROUP BY 
+            DATE(created_at)
+        ORDER BY 
+            DATE(created_at);
+    `;
+
+    const result: QueryResult<PasswordRecoveryMetric> = await this.pool.query(query);
+
+    return result.rows;
   }
 }

@@ -63,7 +63,7 @@ export class MetricController {
   }
 
   private validateMetrics(metricsData: MetricDataDto) {
-    if (metricsData.type === 'register' || metricsData.type === 'login') {
+    if (metricsData.type === 'register' || metricsData.type === 'login' || metricsData.type === 'password') {
       this.validateNormalMetrics(metricsData.metrics);
     } else if (
       metricsData.type === 'register_with_provider' ||

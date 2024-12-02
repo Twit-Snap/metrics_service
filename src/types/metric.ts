@@ -38,6 +38,15 @@ export interface LoginWithProviderMetric {
   date: Date;
   successfulLogins: number;
   successfulLoginsWithProvider: number;
+  averageRecoveryTime: number;
+}
+
+export interface PasswordRecoveryMetric {
+  date: Date;
+  recoveryAttempts: number;
+  successfulRecoveries: number;
+  failedRecoveryAttempts: number;
+  averageRecoveryTime: number;
 }
 
 export interface BlockedMetric {
@@ -90,7 +99,8 @@ export type ParamType =
   | 'location'
   | 'follow'
   | 'auth_twit'
-  | 'hashtag';
+  | 'hashtag'
+  | 'password';
 
 export const PARAM_TYPES: ParamType[] = [
   'register',
@@ -105,7 +115,8 @@ export const PARAM_TYPES: ParamType[] = [
   'location',
   'follow',
   'auth_twit',
-  'hashtag'
+  'hashtag',
+  'password'
 ];
 
 export type Params = {
